@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TownSphere - Smart Residential Operations Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- Flash Notification Modal -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="modal-overlay" id="flashModal-{{ loop.index }}" role="dialog" aria-labelledby="modalTitle-{{ loop.index }}">
+          <div class="modal-box {{ category }}">
+              <h3 id="modalTitle-{{ loop.index }}">{% if category == 'error' %}Notice{% else %}Success{% endif %}</h3>
+              <p>{{ message }}</p>
+              <button type="button" class="btn-primary" onclick="document.getElementById('flashModal-{{ loop.index }}').remove()">OK</button>
+          </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+{% if view == 'gateway' %}
+    <!-- GATEWAY / LOGIN / REGISTER VIEWS -->
+    <div class="gateway-container">
+        <div class="brand-header">
+            <h1>TownSphere</h1>
+            <p>Smart Residential Operations Platform</p>
+        </div>
+
+        {% if not role_selected %}
+            <div class="role-cards">
+                <a href="/?role=resident" class="role-card">
+                    <div class="role-icon">🏢</div>
+                    <div class="role-title">Resident</div>
+                    <div class="role-desc">Raise complaints, track updates, and view service history.</div>
+                </a>
+                <a href="/?role=staff" class="role-card">
+                    <div class="role-icon">🛠️</div>
+                    <div class="role-title">Maintenance Staff</div>
+                    <div class="role-desc">View assigned tasks, update progress, and complete jobs.</div>
+                </a>
+                <a href="/?role=admin" class="role-card">
+                    <div class="role-icon">⚙️</div>
+                    <div class="role-title">Administrator</div>
+                    <div class="role-desc">Manage workers, oversee complaints, and review analytics.</div>
+                </a>
+            </div>
+
+        {% elif action == 'login' %}
+            <div class="auth-box">
+                <div style="margin-bottom: 20px;">
+                    <a href="/" style="text-decoration: none; color: var(--text-muted); font-size: 0.85rem;">← Back to Role Selection</a>
+                </div>
+                <h2>{{ role_selected | capitalize }} Login</h2>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 20px;">Enter your credentials to access TownSphere.</p>
+                
+                <form action="/login" method="POST">
+                    <input type="hidden" name="role" value="{{ role_selected }}">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="name@domain.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+
+                <div class="auth-footer">
+                    {% if role_selected == 'resident' %}
+                        Don't have an account? <a href="/?role=resident&action=register">Sign up as Resident</a>
+                    {% elif role_selected == 'staff' %}
+                        Don't have an account? <a href="/?role=staff&action=register">Sign up as Staff</a>
+                    {% endif %}
+                </div>
+            </div>
+
+        {% elif action == 'register' %}
+            <div class="auth-box">
+                <div style="margin-bottom: 20px;">
+                    <a href="/?role={{ role_selected }}&action=login" style="text-decoration: none; color: var(--text-muted); font-size: 0.85rem;">← Back to Login</a>
+                </div>
+
+                {% if role_selected == 'staff' %}
+                    <!-- STAFF REGISTRATION FORM -->
+                    <h2>Staff Registration</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 20px;">Register as a maintenance worker to receive assigned tasks.</p>
+
+                    <form action="/register_staff" method="POST">
+                        <div class="form-group">
+                            <label for="reg-staff-name">Full Name</label>
+                            <input type="text" id="reg-staff-name" name="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-staff-email">Work Email</label>
+                            <input type="email" id="reg-staff-email" name="email" required placeholder="john.plumber@townsphere.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-staff-password">Password</label>
+                            <input type="password" id="reg-staff-password" name="password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-staff-spec">Specialization / Skill</label>
+                            <select name="specialization" id="reg-staff-spec" required>
+                                <option value="Plumbing">Plumbing</option>
+                                <option value="Electrical">Electrical</option>
+                                <option value="Carpentry">Carpentry</option>
+                                <option value="Gas / Safety">Gas / Safety</option>
+                                <option value="General Maintenance">General Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-staff-phone">Phone Number</label>
+                            <input type="tel" id="reg-staff-phone" name="phone" pattern="[0-9]{10}" placeholder="9876543210">
+                        </div>
+                        <button type="submit" class="btn-primary">Register as Staff</button>
+                    </form>
+
+                    <div class="auth-footer">
+                        Already have a staff account? <a href="/?role=staff&action=login">Sign in</a>
+                    </div>
+
+                {% else %}
+                    <!-- RESIDENT REGISTRATION FORM -->
+                    <h2>Resident Registration</h2>
+                    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 20px;">Create an account to start submitting maintenance requests.</p>
+
+                    <form action="/register" method="POST">
+                        <div class="form-group">
+                            <label for="reg-name">Full Name</label>
+                            <input type="text" id="reg-name" name="name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Email Address</label>
+                            <input type="email" id="reg-email" name="email" required placeholder="john@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Password</label>
+                            <input type="password" id="reg-password" name="password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">Phone Number</label>
+                            <input type="tel" id="reg-phone" name="phone" pattern="[0-9]{10}" placeholder="9876543210">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-apartment">Apartment / Flat Number</label>
+                            <input type="text" id="reg-apartment" name="apartment" required placeholder="A-402">
+                        </div>
+                        <button type="submit" class="btn-primary">Register Account</button>
+                    </form>
+
+                    <div class="auth-footer">
+                        Already have an account? <a href="/?role=resident&action=login">Sign in</a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+{% elif view == 'dashboard' %}
+    <!-- DASHBOARD VIEW WITH SIDEBAR -->
+    <div class="dashboard-layout">
+        <div class="sidebar">
+            <div class="sidebar-brand">TownSphere</div>
+            <ul class="sidebar-menu">
+                {% if session.role == 'resident' %}
+                    <li>
+                        <a href="/?tab=overview" class="{% if active_tab == 'overview' %}active{% endif %}">
+                            📊 <span>Dashboard Overview</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/?tab=raise" class="{% if active_tab == 'raise' %}active{% endif %}">
+                            📝 <span>Raise Complaint</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/?tab=history" class="{% if active_tab == 'history' %}active{% endif %}">
+                            📋 <span>Complaint History</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/?tab=feedback" class="{% if active_tab == 'feedback' %}active{% endif %}">
+                            ⭐ <span>Feedback & Rating</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+            <div class="sidebar-user">
+                <div class="user-name">{{ session.name }}</div>
+                <div class="user-role">{{ session.role | capitalize }} Account</div>
+                <a href="/logout" style="color: var(--danger); text-decoration: none; font-size: 0.875rem; font-weight: 600;">Logout</a>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD CONTENT AREA -->
+        <div class="main-content">
+            {% if session.role == 'resident' %}
+
+                {% if active_tab == 'overview' %}
+                    <div class="content-header">
+                        <h2>Resident Overview</h2>
+                        <p style="color: var(--text-muted);">Real-time status of your household issues.</p>
+                    </div>
+
+                    <!-- ANALYTICS CARDS -->
+                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                        <div class="card" style="flex: 1; text-align: center;">
+                            <h3 style="font-size: 2.2rem; color: var(--primary);">{{ active_count }}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Active Complaints</p>
+                        </div>
+                        <div class="card" style="flex: 1; text-align: center;">
+                            <h3 style="font-size: 2.2rem; color: var(--success);">{{ resolved_count }}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Resolved Tasks</p>
+                        </div>
+                        <div class="card" style="flex: 1; text-align: center;">
+                            <h3 style="font-size: 2.2rem; color: var(--text-main);">{{ total_count }}</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Total Complaints</p>
+                        </div>
+                    </div>
+
+                {% elif active_tab == 'raise' %}
+                    <div class="form-center-wrapper">
+                        <div class="card-form-centered">
+                            <div class="form-header">
+                                <h2>Raise a Service Request</h2>
+                                <p>Fill out the form below to submit maintenance or emergency issues.</p>
+                            </div>
+                            <form action="/raise_complaint" method="POST" enctype="multipart/form-data">
+                                
+                                <!-- Emergency SOS Flag Toggle -->
+                                <div class="emergency-toggle-box">
+                                    <label class="emergency-label" for="emergencyCheckbox">
+                                        <input type="checkbox" name="is_emergency" value="1" id="emergencyCheckbox">
+                                        <span class="emergency-custom-box"></span>
+                                        <div class="emergency-text">
+                                            <strong>🚨 Emergency SOS Request</strong>
+                                            <span>Check this for major leaks, gas issues, or safety hazards needing immediate response.</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="category">Category</label>
+                                    <select name="category" id="category" required>
+                                        <option value="Electrical">Electrical</option>
+                                        <option value="Plumbing">Plumbing</option>
+                                        <option value="Carpentry">Carpentry</option>
+                                        <option value="Gas / Safety">Gas / Safety</option>
+                                        <option value="General Maintenance">General Maintenance</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="prioritySelect">Priority Level</label>
+                                    <select name="priority" id="prioritySelect" required>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="High">High</option>
+                                    </select>
+                                </div>
+
+                                <!-- Preferred Visit Time Slot -->
+                                <div class="form-group">
+                                    <label for="time_slot">Preferred Technician Visit Time Slot</label>
+                                    <select name="time_slot" id="time_slot" required>
+                                        <option value="Anytime">Anytime (Earliest Available)</option>
+                                        <option value="09:00 AM - 12:00 PM">Morning (09:00 AM - 12:00 PM)</option>
+                                        <option value="12:00 PM - 03:00 PM">Afternoon (12:00 PM - 03:00 PM)</option>
+                                        <option value="03:00 PM - 06:00 PM">Evening (03:00 PM - 06:00 PM)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description">Brief Description of Issue</label>
+                                    <textarea name="description" id="description" rows="4" required placeholder="Describe the problem, location inside flat, etc..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="imageUpload">Upload Image (Optional)</label>
+                                    <input type="file" id="imageUpload" name="image" accept="image/*">
+                                    <div id="imagePreviewContainer" style="margin-top: 10px; display: none;">
+                                        <img id="imagePreview" src="#" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 6px;">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-primary">Submit Complaint</button>
+                            </form>
+                        </div>
+                    </div>
+
+                {% elif active_tab == 'history' %}
+                    <div class="content-header">
+                        <h2>Complaint History</h2>
+                        <p style="color: var(--text-muted);">Track real-time progress and details of your reported issues.</p>
+                    </div>
+
+                    <div class="history-cards-container">
+                        {% for c in complaints %}
+                            <div class="complaint-card {% if c[7] == 1 %}emergency-card{% endif %}">
+                                <div class="complaint-card-header">
+                                    <div>
+                                        <span class="complaint-id">#{{ c[0] }}</span>
+                                        <span class="badge category-badge">{{ c[1] }}</span>
+                                        {% if c[7] == 1 %}
+                                            <span class="badge sos-badge">🚨 EMERGENCY SOS</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="badge {{ c[3] }}">{{ c[3] }} Priority</span>
+                                    </div>
+                                </div>
+
+                                <div class="complaint-card-body">
+                                    <div class="complaint-details">
+                                        <p class="description">{{ c[2] }}</p>
+                                        <div class="meta-info">
+                                            <span>🕒 Preferred Slot: <strong>{{ c[5] if c[5] else 'Anytime' }}</strong></span>
+                                        </div>
+                                    </div>
+                                    {% if c[6] %}
+                                        <div class="complaint-image">
+                                            <img src="{{ url_for('static', filename='uploads/' + c[6]) }}" alt="Issue Preview" class="img-preview">
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- REAL-TIME PROGRESS STEPPER -->
+                                <div class="stepper-wrapper">
+                                    <div class="stepper-item {% if c[4] in ['Submitted', 'Assigned', 'In Progress', 'Completed', 'Resolved'] %}completed{% endif %}">
+                                        <div class="step-counter">1</div>
+                                        <div class="step-name">Submitted</div>
+                                    </div>
+                                    <div class="stepper-item {% if c[4] in ['Assigned', 'In Progress', 'Completed', 'Resolved'] %}completed{% endif %}">
+                                        <div class="step-counter">2</div>
+                                        <div class="step-name">Assigned</div>
+                                    </div>
+                                    <div class="stepper-item {% if c[4] in ['In Progress', 'Completed', 'Resolved'] %}completed{% endif %}">
+                                        <div class="step-counter">3</div>
+                                        <div class="step-name">In Progress</div>
+                                    </div>
+                                    <div class="stepper-item {% if c[4] in ['Completed', 'Resolved'] %}completed{% endif %}">
+                                        <div class="step-counter">4</div>
+                                        <div class="step-name">Resolved</div>
+                                    </div>
+                                </div>
+
+                                <div class="complaint-card-footer">
+                                    {% if c[4] in ['Completed', 'Resolved'] %}
+                                        <form action="/reject_resolution" method="POST" onsubmit="return confirm('Reject this resolution and re-open the task?');" class="reject-form">
+                                            <input type="hidden" name="complaint_id" value="{{ c[0] }}">
+                                            <input type="text" name="reason" placeholder="Reason for rejection" required>
+                                            <button type="submit" class="btn-reject">Reject Resolution</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="status-indicator-text">Current Status: <strong>{{ c[4] }}</strong></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="card" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                No complaints recorded yet.
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                {% elif active_tab == 'feedback' %}
+                    <div class="content-header">
+                        <h2>Feedback & Ratings</h2>
+                        <p style="color: var(--text-muted);">Rate staff service for completed complaints.</p>
+                    </div>
+                    <div class="card" style="max-width: 600px;">
+                        {% if unrated_complaints %}
+                            <form action="/submit_rating" method="POST">
+                                <div class="form-group">
+                                    <label for="rating-complaint">Select Resolved Complaint</label>
+                                    <select name="complaint_id" id="rating-complaint" required>
+                                        {% for u in unrated_complaints %}
+                                            <option value="{{ u[0] }}">#{{ u[0] }} - {{ u[1] }} ({{ u[2][:30] }}...)</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rating-score">Rating Score (1 to 5 Stars)</label>
+                                    <select name="rating_score" id="rating-score" required>
+                                        <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                                        <option value="4">⭐⭐⭐⭐ (4 - Good)</option>
+                                        <option value="3">⭐⭐⭐ (3 - Average)</option>
+                                        <option value="2">⭐⭐ (2 - Poor)</option>
+                                        <option value="1">⭐ (1 - Terrible)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="feedback-text">Feedback Comments</label>
+                                    <textarea name="feedback" id="feedback-text" rows="3" placeholder="Write feedback about the staff's work..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn-primary">Submit Feedback</button>
+                            </form>
+                        {% else %}
+                            <p style="color: var(--text-muted);">You have no pending completed complaints awaiting feedback.</p>
+                        {% endif %}
+                    </div>
+
+                {% endif %}
+
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle priority toggle based on Emergency SOS
+        const emergencyCheckbox = document.getElementById('emergencyCheckbox');
+        const prioritySelect = document.getElementById('prioritySelect');
+
+        if (emergencyCheckbox && prioritySelect) {
+            emergencyCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    prioritySelect.value = 'High';
+                } else {
+                    prioritySelect.value = 'Medium';
+                }
+            });
+        }
+
+        // Live Image Preview Handler
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+        if (imageUpload && imagePreview) {
+            imageUpload.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.setAttribute('src', e.target.result);
+                        imagePreviewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreviewContainer.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

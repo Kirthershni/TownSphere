@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TownSphere - Staff Workspace</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- =========================================================
+     FLASH MESSAGE
+========================================================= -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="modal-overlay" id="flashModal">
+
+            {% for category, message in messages %}
+
+                <div class="modal-box {{ category }}"
+                     style="margin-bottom: 10px;">
+
+                    <h3>
+                        {% if category == 'error' %}
+                            Notice
+                        {% else %}
+                            Success
+                        {% endif %}
+                    </h3>
+
+                    <p>{{ message }}</p>
+
+                    <button type="button"
+                            class="btn-primary"
+                            onclick="document.getElementById('flashModal').remove()">
+                        OK
+                    </button>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+    {% endif %}
+{% endwith %}
+
+
+<!-- =========================================================
+     DASHBOARD LAYOUT
+========================================================= -->
+<div class="dashboard-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            TownSphere
+        </div>
+
+        <ul class="sidebar-menu">
+
+            <li>
+                <a href="{{ url_for('staff_dashboard') }}"
+                   class="active">
+
+                    🛠️
+                    <span>Staff Workspace</span>
+
+                </a>
+            </li>
+
+        </ul>
+
+
+        <!-- LOGGED-IN STAFF -->
+        <div class="sidebar-user">
+
+            <div class="user-name">
+                {{ session.get('name', 'Staff Member') }}
+            </div>
+
+            <div class="user-role">
+                Maintenance Staff
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               style="
+                   color: var(--danger);
+                   text-decoration: none;
+                   font-size: 0.875rem;
+                   font-weight: 600;
+               ">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+    <main class="main-content">
+
+
+        <!-- PAGE HEADER -->
+        <div class="content-header">
+
+            <h2>
+                Staff Maintenance Workspace
+            </h2>
+
+            <p style="color: var(--text-muted);">
+                Manage assigned service requests and dispatch offers in real time.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             SECTION 1
+             INCOMING TASK OFFERS
+        ================================================== -->
+        <section style="margin-bottom: 40px;">
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+                📩 Incoming Task Offers
+            </h3>
+
+
+            {% if offered_tasks %}
+
+                <div class="history-cards-container">
+
+                    {% for task in offered_tasks %}
+
+                        <div class="complaint-card
+                            {% if task[6] == 1 %}
+                                emergency-card
+                            {% endif %}
+                        ">
+
+
+                            <!-- CARD HEADER -->
+                            <div class="complaint-card-header">
+
+                                <div>
+
+                                    <span class="complaint-id">
+                                        #{{ task[1] }}
+                                    </span>
+
+                                    <span class="badge category-badge">
+                                        {{ task[2] }}
+                                    </span>
+
+
+                                    {% if task[6] == 1 %}
+
+                                        <span class="badge sos-badge">
+                                            🚨 EMERGENCY SOS
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div>
+
+                                    <span class="badge {{ task[4] }}">
+                                        {{ task[4] }} Priority
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CARD BODY -->
+                            <div class="complaint-card-body">
+
+                                <div class="complaint-details">
+
+                                    <p class="description">
+
+                                        <strong>
+                                            Issue:
+                                        </strong>
+
+                                        {{ task[3] }}
+
+                                    </p>
+
+
+                                    <div class="meta-info">
+
+                                        <span>
+                                            🏢 Unit:
+                                            <strong>
+                                                {{ task[8] }}
+                                            </strong>
+                                        </span>
+
+                                        |
+
+                                        <span>
+                                            🕒 Preferred Slot:
+                                            <strong>
+                                                {{ task[5] }}
+                                            </strong>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- IMAGE -->
+                                {% if task[7] %}
+
+                                    <div class="complaint-image">
+
+                                        <img
+                                            src="{{ url_for(
+                                                'static',
+                                                filename='uploads/' + task[7]
+                                            ) }}"
+                                            alt="Issue Preview"
+                                            class="img-preview"
+                                        >
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 ACCEPT / REJECT
+                            ================================================== -->
+                            <div class="complaint-card-footer"
+                                 style="
+                                     display: flex;
+                                     gap: 12px;
+                                 ">
+
+
+                                <!-- ACCEPT -->
+                                <form
+                                    action="{{ url_for('worker_respond') }}"
+                                    method="POST"
+                                    style="flex: 1;"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="assignment_id"
+                                        value="{{ task[0] }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="complaint_id"
+                                        value="{{ task[1] }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="accept"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="btn-primary"
+                                        style="
+                                            background: var(--success);
+                                            width: 100%;
+                                        "
+                                    >
+                                        Accept Job
+                                    </button>
+
+                                </form>
+
+
+                                <!-- REJECT -->
+                                <form
+                                    action="{{ url_for('worker_respond') }}"
+                                    method="POST"
+                                    style="flex: 1;"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="assignment_id"
+                                        value="{{ task[0] }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="complaint_id"
+                                        value="{{ task[1] }}"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="reject"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="btn-reject"
+                                        style="width: 100%;"
+                                    >
+                                        Decline
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="card"
+                     style="
+                         text-align: center;
+                         color: var(--text-muted);
+                         padding: 30px;
+                     ">
+
+                    No pending job offers right now.
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 2
+             ACTIVE TASKS
+        ================================================== -->
+        <section>
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+                ⚡ Active & Re-opened Tasks
+            </h3>
+
+
+            {% if active_tasks %}
+
+                <div class="history-cards-container">
+
+                    {% for job in active_tasks %}
+
+                        <div class="complaint-card
+                            {% if job[6] == 1 %}
+                                emergency-card
+                            {% endif %}
+                        ">
+
+
+                            <!-- CARD HEADER -->
+                            <div class="complaint-card-header">
+
+                                <div>
+
+                                    <span class="complaint-id">
+                                        #{{ job[0] }}
+                                    </span>
+
+                                    <span class="badge category-badge">
+                                        {{ job[1] }}
+                                    </span>
+
+
+                                    {% if job[9] == 'Re-opened' %}
+
+                                        <span
+                                            class="badge sos-badge"
+                                            style="
+                                                background: var(--danger);
+                                                color: white;
+                                            "
+                                        >
+                                            ⚠️ RESIDENT REJECTED RESOLUTION
+                                        </span>
+
+
+                                    {% elif job[6] == 1 %}
+
+                                        <span class="badge sos-badge">
+                                            🚨 EMERGENCY SOS
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div>
+
+                                    <span class="badge {{ job[3] }}">
+                                        {{ job[3] }} Priority
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CARD BODY -->
+                            <div class="complaint-card-body">
+
+                                <div class="complaint-details">
+
+                                    <p class="description">
+
+                                        <strong>
+                                            Issue Details:
+                                        </strong>
+
+                                        {{ job[2] }}
+
+                                    </p>
+
+
+                                    <div class="meta-info">
+
+                                        <span>
+                                            🏢 Unit:
+                                            <strong>
+                                                {{ job[7] }}
+                                            </strong>
+                                        </span>
+
+                                        |
+
+                                        <span>
+                                            📞 Phone:
+                                            <strong>
+                                                {{ job[8] }}
+                                            </strong>
+                                        </span>
+
+                                        |
+
+                                        <span>
+                                            🕒 Preferred Slot:
+                                            <strong>
+                                                {{ job[5] }}
+                                            </strong>
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 UPDATE STATUS
+                            ================================================== -->
+                            <div class="complaint-card-footer"
+                                 style="
+                                     display: flex;
+                                     justify-content: space-between;
+                                     align-items: center;
+                                     gap: 10px;
+                                 ">
+
+
+                                <span class="status-indicator-text">
+
+                                    Current Status:
+
+                                    <strong>
+                                        {{ job[4] }}
+                                    </strong>
+
+                                </span>
+
+
+                                <form
+                                    action="{{ url_for('update_task_status') }}"
+                                    method="POST"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="complaint_id"
+                                        value="{{ job[0] }}"
+                                    >
+
+
+                                    {% if job[9] == 'Re-opened'
+                                          or job[4] == 'Assigned' %}
+
+                                        <input
+                                            type="hidden"
+                                            name="status"
+                                            value="In Progress"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn-primary"
+                                        >
+                                            Start / Re-start Work
+                                        </button>
+
+
+                                    {% elif job[4] == 'In Progress' %}
+
+                                        <input
+                                            type="hidden"
+                                            name="status"
+                                            value="Completed"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn-primary"
+                                            style="
+                                                background: var(--success);
+                                            "
+                                        >
+                                            Mark Job Completed
+                                        </button>
+
+                                    {% endif %}
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="card"
+                     style="
+                         text-align: center;
+                         color: var(--text-muted);
+                         padding: 30px;
+                     ">
+
+                    You have no active ongoing jobs.
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!-- UNIFIED TOWNSPHERE NAVBAR -->
+<aside class="sidebar-glass">
+    <div class="brand">
+        <h2>Town<span>Sphere</span></h2>
+        <span class="role-badge role-{{ session.get('role', 'guest') }}">
+            {{ session.get('role', 'Guest') | upper }}
+        </span>
+    </div>
+
+    <nav class="nav-menu">
+        <!-- RESIDENT LINKS -->
+        {% if session.get('role') == 'resident' %}
+            <a href="/complaints" class="nav-item {{ 'active' if request.path == '/complaints' }}">
+                <span>📋</span> My Complaints
+            </a>
+            <a href="/raise-complaint" class="nav-item {{ 'active' if request.path == '/raise-complaint' }}">
+                <span>➕</span> Log New Request
+            </a>
+
+        <!-- MAINTENANCE WORKER LINKS -->
+        {% elif session.get('role') == 'staff' %}
+            <a href="/staff/dashboard" class="nav-item {{ 'active' if request.path == '/staff/dashboard' }}">
+                <span>🛠️</span> Assigned Jobs
+            </a>
+
+        <!-- ADMINISTRATOR LINKS -->
+        {% elif session.get('role') == 'admin' %}
+            <a href="/admin/dashboard" class="nav-item {{ 'active' if request.path == '/admin/dashboard' }}">
+                <span>📊</span> System Overview
+            </a>
+        {% endif %}
+
+        <!-- COMMON UTILITIES -->
+        {% if session.get('role') %}
+            <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); padding: 0.5rem 1rem;">
+                    Active as: <strong>{{ session.get('staff_name') or session.get('admin_name') or 'Resident' }}</strong>
+                </div>
+                <a href="/logout" class="nav-item logout">
+                    <span>🚪</span> Sign Out
+                </a>
+            </div>
+        {% else %}
+            <a href="/staff-login" class="nav-item {{ 'active' if request.path == '/staff-login' }}">
+                <span>🔐</span> Staff Portal
+            </a>
+            <a href="/admin/login" class="nav-item {{ 'active' if request.path == '/admin/login' }}">
+                <span>⚙️</span> Admin Portal
+            </a>
+        {% endif %}
+    </nav>
+</aside>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TownSphere - Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     FLASH MESSAGE
+========================================================= -->
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="modal-overlay" id="flashModal">
+
+            {% for category, message in messages %}
+
+                <div class="modal-box {{ category }}"
+                     style="margin-bottom: 10px;">
+
+                    <h3>
+
+                        {% if category == 'error' %}
+                            Notice
+                        {% else %}
+                            Success
+                        {% endif %}
+
+                    </h3>
+
+                    <p>
+                        {{ message }}
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        onclick="document.getElementById('flashModal').remove()">
+
+                        OK
+
+                    </button>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+
+
+<!-- =========================================================
+     DASHBOARD LAYOUT
+========================================================= -->
+
+<div class="dashboard-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="sidebar-brand">
+            TownSphere
+        </div>
+
+
+
+        <!-- NAVIGATION -->
+
+        <ul class="sidebar-menu">
+
+
+            <li>
+
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="active">
+
+                    📊
+
+                    <span>
+                        Admin Dashboard
+                    </span>
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+
+
+        <!-- LOGGED-IN ADMIN -->
+
+        <div class="sidebar-user">
+
+
+            <div class="user-name">
+
+                {{ session.get('name', 'Admin') }}
+
+            </div>
+
+
+            <div class="user-role">
+
+                Administrator
+
+            </div>
+
+
+            <a href="{{ url_for('logout') }}"
+               style="
+                   color: var(--danger);
+                   text-decoration: none;
+                   font-size: 0.875rem;
+                   font-weight: 600;
+               ">
+
+                Logout
+
+            </a>
+
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="content-header">
+
+            <h2>
+                Township Administration
+            </h2>
+
+            <p style="color: var(--text-muted);">
+
+                Monitor complaints, manage administrators,
+                and control maintenance worker dispatch.
+
+            </p>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SECTION 1
+             SYSTEM OVERVIEW
+        ================================================== -->
+
+        <section style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+
+                📊 System Overview
+
+            </h3>
+
+
+
+            <div style="
+                display: grid;
+                grid-template-columns:
+                    repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            ">
+
+
+                <!-- TOTAL -->
+
+                <div class="card"
+                     style="text-align: center;">
+
+                    <h3 style="
+                        font-size: 2rem;
+                        color: var(--primary);
+                        margin-bottom: 5px;
+                    ">
+
+                        {{ stats.total if stats else 0 }}
+
+                    </h3>
+
+                    <p style="color: var(--text-muted);">
+
+                        Total Complaints
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- PENDING -->
+
+                <div class="card"
+                     style="text-align: center;">
+
+                    <h3 style="
+                        font-size: 2rem;
+                        color: var(--warning);
+                        margin-bottom: 5px;
+                    ">
+
+                        {{ stats.pending if stats else 0 }}
+
+                    </h3>
+
+                    <p style="color: var(--text-muted);">
+
+                        Pending Broadcast
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- IN PROGRESS -->
+
+                <div class="card"
+                     style="text-align: center;">
+
+                    <h3 style="
+                        font-size: 2rem;
+                        color: var(--primary);
+                        margin-bottom: 5px;
+                    ">
+
+                        {{ stats.in_progress if stats else 0 }}
+
+                    </h3>
+
+                    <p style="color: var(--text-muted);">
+
+                        In Progress
+
+                    </p>
+
+                </div>
+
+
+
+                <!-- RESOLVED -->
+
+                <div class="card"
+                     style="text-align: center;">
+
+                    <h3 style="
+                        font-size: 2rem;
+                        color: var(--success);
+                        margin-bottom: 5px;
+                    ">
+
+                        {{ stats.resolved if stats else 0 }}
+
+                    </h3>
+
+                    <p style="color: var(--text-muted);">
+
+                        Resolved
+
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 2
+             REGISTER ADMIN
+        ================================================== -->
+
+        <section style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+
+                👤 Register New Administrator
+
+            </h3>
+
+
+
+            <div class="card">
+
+
+                <form
+                    action="{{ url_for('create_admin') }}"
+                    method="POST"
+                >
+
+
+                    {% if csrf_token is defined %}
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                    {% endif %}
+
+
+
+                    <div style="
+                        display: grid;
+                        grid-template-columns:
+                            repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 15px;
+                        align-items: end;
+                    ">
+
+
+                        <!-- NAME -->
+
+                        <div class="form-group"
+                             style="margin-bottom: 0;">
+
+                            <label for="admin-name">
+
+                                Full Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="admin-name"
+                                name="name"
+                                placeholder="Administrator Name"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <!-- USERNAME -->
+
+                        <div class="form-group"
+                             style="margin-bottom: 0;">
+
+                            <label for="admin-username">
+
+                                Username / Email
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="admin-username"
+                                name="username"
+                                placeholder="admin@example.com"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <!-- PASSWORD -->
+
+                        <div class="form-group"
+                             style="margin-bottom: 0;">
+
+                            <label for="admin-password">
+
+                                Password
+
+                            </label>
+
+                            <input
+                                type="password"
+                                id="admin-password"
+                                name="password"
+                                placeholder="Enter password"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <!-- CREATE -->
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                        >
+
+                            Create Administrator
+
+                        </button>
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 3
+             COMPLAINT DISPATCH
+        ================================================== -->
+
+        <section style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 8px;
+                color: var(--text-main);
+            ">
+
+                🛠️ Global Complaint Dispatch & Tracking
+
+            </h3>
+
+
+            <p style="
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            ">
+
+                Complaints are automatically allocated using
+                worker specialization, workload, availability,
+                and proximity. Administrators can manually
+                override an allocation when required.
+
+            </p>
+
+
+
+            <div class="card"
+                 style="
+                     padding: 0;
+                     overflow-x: auto;
+                 ">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Resident</th>
+
+                            <th>Category</th>
+
+                            <th>Priority</th>
+
+                            <th>Status</th>
+
+                            <th>Assigned Worker</th>
+
+                            <th>Allocation Method</th>
+
+                            <th>Manual Override</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        {% for c in complaints %}
+
+
+                        <tr>
+
+
+                            <!-- ID -->
+
+                            <td>
+
+                                <strong>
+                                    #{{ c[0] }}
+                                </strong>
+
+                            </td>
+
+
+
+                            <!-- RESIDENT -->
+
+                            <td>
+
+                                {{ c[1] }}
+
+                            </td>
+
+
+
+                            <!-- CATEGORY -->
+
+                            <td>
+
+                                <span class="badge category-badge">
+
+                                    {{ c[2] }}
+
+                                </span>
+
+                            </td>
+
+
+
+                            <!-- PRIORITY -->
+
+                            <td>
+
+
+                                <span class="badge {{ c[3] }}">
+
+                                    {{ c[3] }}
+
+                                </span>
+
+
+                            </td>
+
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                <span class="badge status-pill">
+
+                                    {{ c[4] }}
+
+                                </span>
+
+                            </td>
+
+
+
+                            <!-- WORKER -->
+
+                            <td>
+
+
+                                {% if c[5] %}
+
+                                    <strong>
+                                        {{ c[5] }}
+                                    </strong>
+
+                                {% else %}
+
+                                    <span style="
+                                        color: var(--text-muted);
+                                    ">
+
+                                        Unassigned
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+
+
+                            <!-- ALLOCATION METHOD -->
+
+                            <td>
+
+
+                                {% if c[5] %}
+
+                                    <span style="
+                                        color: var(--success);
+                                        font-weight: 600;
+                                        font-size: 0.85rem;
+                                    ">
+
+                                        🤖 Auto Allocated
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span style="
+                                        color: var(--text-muted);
+                                        font-size: 0.85rem;
+                                    ">
+
+                                        ⏳ Awaiting Allocation
+
+                                    </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+
+
+                            <!-- MANUAL OVERRIDE -->
+
+                            <td>
+
+
+                                {% if c[4] not in ['Resolved', 'Completed'] %}
+
+
+                                    <form
+                                        action="{{ url_for('assign_worker') }}"
+                                        method="POST"
+                                        style="
+                                            display: flex;
+                                            gap: 8px;
+                                            align-items: center;
+                                        "
+                                    >
+
+
+                                        {% if csrf_token is defined %}
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
+                                        {% endif %}
+
+
+
+                                        <input
+                                            type="hidden"
+                                            name="complaint_id"
+                                            value="{{ c[0] }}"
+                                        >
+
+
+
+                                        <select
+                                            name="staff_id"
+                                            required
+                                            style="
+                                                padding: 7px;
+                                                border: 1px solid var(--border-color);
+                                                border-radius: 8px;
+                                                font-size: 0.8rem;
+                                                min-width: 150px;
+                                            "
+                                        >
+
+                                            <option value="">
+
+                                                Select Technician
+
+                                            </option>
+
+
+
+                                            {% for s in available_staff %}
+
+
+                                                {% set category_match =
+                                                    c[6] if c|length > 6 else c[2]
+                                                %}
+
+
+                                                {% if
+                                                    not category_match
+                                                    or
+                                                    s[2]|lower ==
+                                                    category_match|lower
+                                                %}
+
+
+                                                    <option
+                                                        value="{{ s[0] }}"
+                                                    >
+
+                                                        {{ s[1] }}
+
+                                                        -
+
+                                                        {{ s[2] }}
+
+                                                        (
+                                                        {{
+                                                            'Available'
+                                                            if s[3] in [1, True, '1']
+                                                            else 'Busy'
+                                                        }}
+                                                        )
+
+                                                    </option>
+
+
+                                                {% endif %}
+
+
+                                            {% endfor %}
+
+
+                                        </select>
+
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn-primary"
+                                            style="
+                                                width: auto;
+                                                padding: 7px 12px;
+                                                font-size: 0.8rem;
+                                            "
+                                        >
+
+                                            Override
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                {% else %}
+
+
+                                    <span style="
+                                        color: var(--success);
+                                        font-weight: 600;
+                                        font-size: 0.85rem;
+                                    ">
+
+                                        ✓ Completed
+
+                                    </span>
+
+
+                                {% endif %}
+
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% else %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                style="
+                                    text-align: center;
+                                    color: var(--text-muted);
+                                    padding: 30px;
+                                "
+                            >
+
+                                No complaints logged in system.
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 4
+             TECHNICIAN ROSTER
+        ================================================== -->
+
+        <section>
+
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+
+                👷 Maintenance Technician Roster
+
+            </h3>
+
+
+
+            <div class="card"
+                 style="
+                     padding: 0;
+                     overflow-x: auto;
+                 ">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Staff ID</th>
+
+                            <th>Name</th>
+
+                            <th>Category Domain</th>
+
+                            <th>Skill Rating</th>
+
+                            <th>Current Availability</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        {% for s in staff_list %}
+
+
+                        <tr>
+
+
+                            <!-- STAFF ID -->
+
+                            <td>
+
+                                <strong>
+                                    #{{ s[0] }}
+                                </strong>
+
+                            </td>
+
+
+
+                            <!-- NAME -->
+
+                            <td>
+
+                                {{ s[1] }}
+
+                            </td>
+
+
+
+                            <!-- DOMAIN -->
+
+                            <td>
+
+                                <span class="badge category-badge">
+
+                                    {{ s[2] }}
+
+                                </span>
+
+                            </td>
+
+
+
+                            <!-- SKILL -->
+
+                            <td>
+
+                                Level {{ s[3] }}
+
+                            </td>
+
+
+
+                            <!-- AVAILABILITY -->
+
+                            <td>
+
+
+                                {% if s[4] in [1, True, '1'] %}
+
+
+                                    <span
+                                        class="badge"
+                                        style="
+                                            background: #d1fae5;
+                                            color: #065f46;
+                                        "
+                                    >
+
+                                        Available
+
+                                    </span>
+
+
+                                {% else %}
+
+
+                                    <span
+                                        class="badge High"
+                                    >
+
+                                        Busy
+
+                                    </span>
+
+
+                                {% endif %}
+
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% else %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                style="
+                                    text-align: center;
+                                    color: var(--text-muted);
+                                    padding: 30px;
+                                "
+                            >
+
+                                No technicians registered.
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>
