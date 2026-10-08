@@ -189,6 +189,24 @@
                             ⭐ <span>Feedback & Rating</span>
                         </a>
                     </li>
+                    <li>
+    <a href="{{ url_for('notifications') }}">
+        🔔 <span>Notifications</span>
+
+        {% if unread_notification_count > 0 %}
+            <span style="
+                background: var(--danger);
+                color: white;
+                border-radius: 50%;
+                padding: 2px 7px;
+                font-size: 0.75rem;
+                margin-left: auto;
+            ">
+                {{ unread_notification_count }}
+            </span>
+        {% endif %}
+    </a>
+</li>
                 {% endif %}
             </ul>
             <div class="sidebar-user">
@@ -331,6 +349,110 @@
                                 </div>
 
                                 <!-- REAL-TIME PROGRESS STEPPER -->
+                                 <!-- =================================================
+     STAFF WORK PROGRESS & COMPLETION UPDATES
+================================================== -->
+
+<div class="work-history">
+
+    <h4 class="work-history-title">
+        🔧 Work Progress & Updates
+    </h4>
+
+    {% set has_updates = namespace(value=false) %}
+
+    {% for update in work_updates %}
+
+        {% if update[0] == c[0] %}
+
+            {% set has_updates.value = true %}
+
+            <div class="work-history-item">
+
+                <!-- STATUS AND DATE -->
+
+                <div class="work-history-header">
+
+                    <span class="badge
+                        {% if update[1] == 'Completed' %}
+                            Low
+                        {% else %}
+                            Medium
+                        {% endif %}
+                    ">
+                        {{ update[1] }}
+                    </span>
+
+                    <span class="work-history-date">
+                        {{ update[4] }}
+                    </span>
+
+                </div>
+
+
+                <!-- STAFF NAME -->
+
+                {% if update[5] %}
+
+                    <p class="work-history-staff">
+                        Updated by:
+                        <strong>{{ update[5] }}</strong>
+                    </p>
+
+                {% endif %}
+
+
+                <!-- WORK DESCRIPTION -->
+
+                {% if update[2] %}
+
+                    <p class="work-history-description">
+                        {{ update[2] }}
+                    </p>
+
+                {% endif %}
+
+
+                <!-- WORK IMAGE -->
+
+                {% if update[3] %}
+
+                    <div class="work-history-image">
+
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename=(
+                                    update[3]
+                                    if update[3].startswith('uploads/')
+                                    else 'uploads/' + update[3]
+                                )
+                            ) }}"
+                            alt="Work update for complaint #{{ c[0] }}"
+                        >
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    <!-- NO UPDATES MESSAGE -->
+
+    {% if not has_updates.value %}
+
+        <p class="work-history-empty">
+            No work updates have been submitted yet.
+        </p>
+
+    {% endif %}
+
+</div>
                                 <div class="stepper-wrapper">
                                     <div class="stepper-item {% if c[4] in ['Submitted', 'Assigned', 'In Progress', 'Completed', 'Resolved'] %}completed{% endif %}">
                                         <div class="step-counter">1</div>
