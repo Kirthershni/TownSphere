@@ -750,15 +750,15 @@ th {
     border-radius: 6px;
     font-size: 0.85rem;
 }
-
 .btn-reject {
     background: #ef4444;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 1rem;
 }
 .rejection-alert {
     background: #fffbebfb;
@@ -768,4 +768,269 @@ th {
     border-radius: 8px;
     font-size: 0.85rem;
     margin-top: 10px;
+}
+/* =====================================================
+   ADMIN NOTIFICATIONS
+===================================================== */
+
+.notification-card {
+    margin-bottom: 15px;
+}
+
+.notification-unread {
+    border-left: 4px solid var(--primary);
+}
+
+.notification-read {
+    border-left: 4px solid var(--border-color);
+}
+/* =========================================
+   STAFF TASK - WORK UPDATE FORM
+========================================= */
+
+.task-update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Description and image fields */
+.work-update-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+}
+
+.work-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.work-field label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* Description box */
+.work-field textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #ffffff;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.work-field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Image upload */
+.work-field input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: #f8fafc;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.work-field input[type="file"]::file-selector-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-right: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.work-field input[type="file"]::file-selector-button:hover {
+    background: var(--primary-hover);
+}
+
+/* Submit button */
+.task-update-form .btn-primary {
+    width: 100%;
+    margin-top: 2px;
+}
+
+/* Mobile layout */
+@media (max-width: 700px) {
+    .work-update-fields {
+        grid-template-columns: 1fr;
+    }
+}
+/* =====================================================
+   STAFF TASK UPDATE FORM
+===================================================== */
+
+.task-update-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.task-current-status {
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.task-current-status .status-indicator-text {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.task-current-status strong {
+    color: var(--text-main);
+}
+
+
+/* FORM LAYOUT */
+
+.task-update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+}
+
+.work-update-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px;
+    width: 100%;
+}
+
+.work-field {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.work-field label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+
+/* DESCRIPTION */
+
+.work-field textarea {
+    display: block;
+    width: 100%;
+    min-height: 110px;
+    padding: 12px 14px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: var(--text-main);
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+
+    resize: vertical;
+    outline: none;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.work-field textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+
+/* IMAGE UPLOAD */
+
+.work-field input[type="file"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+
+    background: #f8fafc;
+    color: var(--text-muted);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.work-field input[type="file"]::file-selector-button {
+    padding: 9px 12px;
+    margin-right: 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: var(--primary);
+    color: #ffffff;
+
+    font-family: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.work-field input[type="file"]::file-selector-button:hover {
+    background: var(--primary-hover);
+}
+
+.work-image-hint {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+
+/* STATUS BUTTON */
+
+.task-status-button {
+    width: 100%;
+    margin-top: 2px;
+}
+
+.task-complete-button {
+    background: var(--success);
+}
+
+.task-complete-button:hover {
+    background: #059669;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+    .work-update-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .task-update-footer {
+        gap: 14px;
+    }
 }
