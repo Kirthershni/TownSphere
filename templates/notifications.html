@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Notifications - TownSphere</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+        /* =====================================================
+           NOTIFICATIONS PAGE
+           ===================================================== */
+
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .notifications-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* =====================================================
+           BUTTONS
+           ===================================================== */
+
+        .btn {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .mark-all {
+            background: #222;
+            color: white;
+        }
+
+        .mark-all:hover {
+            background: #000;
+        }
+
+        /* =====================================================
+           NOTIFICATION CARD
+           ===================================================== */
+
+        .notification {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .notification.unread {
+            border-left: 5px solid #2563eb;
+        }
+
+        .notification.read {
+            opacity: 0.75;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .details {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 12px;
+        }
+
+        /* =====================================================
+           MARK AS READ BUTTON
+           ===================================================== */
+
+        .read-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .read-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* =====================================================
+           EMPTY NOTIFICATIONS
+           ===================================================== */
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            background: white;
+            border-radius: 12px;
+            color: #777;
+        }
+
+        /* =====================================================
+           NOTIFICATION COUNT
+           ===================================================== */
+
+        .notification-badge {
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 0.75rem;
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
+
+    <div class="sidebar">
+
+        <div class="sidebar-brand">
+            TownSphere
+        </div>
+
+        <ul class="sidebar-menu">
+
+            {% if session.role == 'resident' %}
+
+                <!-- Resident Dashboard Overview -->
+                <li>
+                    <a href="/?tab=overview">
+                        📊
+                        <span>Dashboard Overview</span>
+                    </a>
+                </li>
+
+                <!-- Raise Complaint -->
+                <li>
+                    <a href="/?tab=raise">
+                        📝
+                        <span>Raise Complaint</span>
+                    </a>
+                </li>
+
+                <!-- Complaint History -->
+                <li>
+                    <a href="/?tab=history">
+                        📋
+                        <span>Complaint History</span>
+                    </a>
+                </li>
+
+                <!-- Feedback and Rating -->
+                <li>
+                    <a href="/?tab=feedback">
+                        ⭐
+                        <span>Feedback & Rating</span>
+                    </a>
+                </li>
+
+                <!-- Resident Notifications -->
+                <li>
+                    <a
+                        href="{{ url_for('notifications') }}"
+                        class="active"
+                    >
+                        🔔
+                        <span>Notifications</span>
+
+                        {% if unread_notification_count > 0 %}
+                            <span class="notification-badge">
+                                {{ unread_notification_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                </li>
+
+            {% elif session.role == 'staff' %}
+
+                <!-- Staff Dashboard -->
+                <li>
+                    <a href="{{ url_for('staff_dashboard') }}">
+                        📊
+                        <span>Staff Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Staff Notifications -->
+                <li>
+                    <a
+                        href="{{ url_for('notifications') }}"
+                        class="active"
+                    >
+                        🔔
+                        <span>Notifications</span>
+
+                        {% if unread_notification_count > 0 %}
+                            <span class="notification-badge">
+                                {{ unread_notification_count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                </li>
+
+            {% endif %}
+
+        </ul>
+
+        <!-- =================================================
+             BOTTOM USER SECTION
+             ================================================= -->
+
+        <div class="sidebar-user">
+
+            <div class="user-name">
+                {{ session.name }}
+            </div>
+
+            <div class="user-role">
+                {{ session.role | capitalize }} Account
+            </div>
+
+            <a
+                href="/logout"
+                style="
+                    color: var(--danger);
+                    text-decoration: none;
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                "
+            >
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================================
+         MAIN CONTENT
+         ===================================================== -->
+
+    <div class="main-content">
+
+        <!-- Page Header -->
+        <div class="notifications-header">
+
+            <h1>Notifications</h1>
+
+            {% if notifications %}
+                <form
+                    method="POST"
+                    action="{{ url_for('mark_all_notifications_read') }}"
+                >
+                    <button
+                        type="submit"
+                        class="btn mark-all"
+                    >
+                        Mark All as Read
+                    </button>
+                </form>
+            {% endif %}
+
+        </div>
+
+        <!-- =================================================
+             NOTIFICATIONS
+             ================================================= -->
+
+        {% if notifications %}
+
+            {% for notification in notifications %}
+
+                <div
+                    class="
+                        notification
+                        {% if notification[5] == 'Unread' %}
+                            unread
+                        {% else %}
+                            read
+                        {% endif %}
+                    "
+                >
+
+                    <!-- Notification Message -->
+                    <div class="message">
+                        {{ notification[3] }}
+                    </div>
+
+                    <!-- Notification Details -->
+                    <div class="details">
+
+                        Type: {{ notification[2] }}
+
+                        {% if notification[1] %}
+                            | Assignment: #{{ notification[1] }}
+                        {% endif %}
+
+                        {% if notification[4] %}
+                            | {{ notification[4] }}
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Mark Individual Notification as Read -->
+                    {% if notification[5] == 'Unread' %}
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'mark_notification_read',
+                                notification_id=notification[0]
+                            ) }}"
+                        >
+                            <button
+                                type="submit"
+                                class="btn read-btn"
+                            >
+                                Mark as Read
+                            </button>
+                        </form>
+
+                    {% else %}
+
+                        <span>✓ Read</span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <!-- No Notifications -->
+            <div class="empty">
+
+                <h3>No notifications</h3>
+
+                <p>You are all caught up.</p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
