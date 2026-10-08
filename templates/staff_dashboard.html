@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>TownSphere - Staff Workspace</title>
 
     <link rel="stylesheet"
@@ -14,6 +15,7 @@
 <!-- =========================================================
      FLASH MESSAGE
 ========================================================= -->
+
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="modal-overlay" id="flashModal">
@@ -51,12 +53,14 @@
 <!-- =========================================================
      DASHBOARD LAYOUT
 ========================================================= -->
+
 <div class="dashboard-layout">
 
 
     <!-- =====================================================
          SIDEBAR
     ====================================================== -->
+
     <aside class="sidebar">
 
         <div class="sidebar-brand">
@@ -68,10 +72,28 @@
             <li>
                 <a href="{{ url_for('staff_dashboard') }}"
                    class="active">
-
                     🛠️
                     <span>Staff Workspace</span>
+                </a>
+            </li>
 
+            <li>
+                <a href="{{ url_for('notifications') }}">
+                    🔔
+                    <span>Notifications</span>
+
+                    {% if unread_notification_count > 0 %}
+                        <span style="
+                            background: var(--danger);
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 7px;
+                            font-size: 0.75rem;
+                            margin-left: auto;
+                        ">
+                            {{ unread_notification_count }}
+                        </span>
+                    {% endif %}
                 </a>
             </li>
 
@@ -79,6 +101,7 @@
 
 
         <!-- LOGGED-IN STAFF -->
+
         <div class="sidebar-user">
 
             <div class="user-name">
@@ -96,9 +119,7 @@
                    font-size: 0.875rem;
                    font-weight: 600;
                ">
-
                 Logout
-
             </a>
 
         </div>
@@ -109,10 +130,12 @@
     <!-- =====================================================
          MAIN CONTENT
     ====================================================== -->
+
     <main class="main-content">
 
 
         <!-- PAGE HEADER -->
+
         <div class="content-header">
 
             <h2>
@@ -127,9 +150,9 @@
 
 
         <!-- =================================================
-             SECTION 1
-             INCOMING TASK OFFERS
+             SECTION 1: INCOMING TASK OFFERS
         ================================================== -->
+
         <section style="margin-bottom: 40px;">
 
             <h3 style="
@@ -154,6 +177,7 @@
 
 
                             <!-- CARD HEADER -->
+
                             <div class="complaint-card-header">
 
                                 <div>
@@ -166,61 +190,46 @@
                                         {{ task[2] }}
                                     </span>
 
-
                                     {% if task[6] == 1 %}
-
                                         <span class="badge sos-badge">
                                             🚨 EMERGENCY SOS
                                         </span>
-
                                     {% endif %}
 
                                 </div>
 
-
                                 <div>
-
                                     <span class="badge {{ task[4] }}">
                                         {{ task[4] }} Priority
                                     </span>
-
                                 </div>
 
                             </div>
 
 
                             <!-- CARD BODY -->
+
                             <div class="complaint-card-body">
 
                                 <div class="complaint-details">
 
                                     <p class="description">
-
-                                        <strong>
-                                            Issue:
-                                        </strong>
-
+                                        <strong>Issue:</strong>
                                         {{ task[3] }}
-
                                     </p>
-
 
                                     <div class="meta-info">
 
                                         <span>
                                             🏢 Unit:
-                                            <strong>
-                                                {{ task[8] }}
-                                            </strong>
+                                            <strong>{{ task[8] }}</strong>
                                         </span>
 
                                         |
 
                                         <span>
                                             🕒 Preferred Slot:
-                                            <strong>
-                                                {{ task[5] }}
-                                            </strong>
+                                            <strong>{{ task[5] }}</strong>
                                         </span>
 
                                     </div>
@@ -228,7 +237,8 @@
                                 </div>
 
 
-                                <!-- IMAGE -->
+                                <!-- RESIDENT'S ORIGINAL IMAGE -->
+
                                 {% if task[7] %}
 
                                     <div class="complaint-image">
@@ -249,9 +259,8 @@
                             </div>
 
 
-                            <!-- =================================================
-                                 ACCEPT / REJECT
-                            ================================================== -->
+                            <!-- ACCEPT / REJECT -->
+
                             <div class="complaint-card-footer"
                                  style="
                                      display: flex;
@@ -260,6 +269,7 @@
 
 
                                 <!-- ACCEPT -->
+
                                 <form
                                     action="{{ url_for('worker_respond') }}"
                                     method="POST"
@@ -299,6 +309,7 @@
 
 
                                 <!-- REJECT -->
+
                                 <form
                                     action="{{ url_for('worker_respond') }}"
                                     method="POST"
@@ -350,9 +361,7 @@
                          color: var(--text-muted);
                          padding: 30px;
                      ">
-
                     No pending job offers right now.
-
                 </div>
 
             {% endif %}
@@ -362,9 +371,9 @@
 
 
         <!-- =================================================
-             SECTION 2
-             ACTIVE TASKS
+             SECTION 2: ACTIVE TASKS
         ================================================== -->
+
         <section>
 
             <h3 style="
@@ -389,6 +398,7 @@
 
 
                             <!-- CARD HEADER -->
+
                             <div class="complaint-card-header">
 
                                 <div>
@@ -438,6 +448,7 @@
 
 
                             <!-- CARD BODY -->
+
                             <div class="complaint-card-body">
 
                                 <div class="complaint-details">
@@ -457,27 +468,21 @@
 
                                         <span>
                                             🏢 Unit:
-                                            <strong>
-                                                {{ job[7] }}
-                                            </strong>
+                                            <strong>{{ job[7] }}</strong>
                                         </span>
 
                                         |
 
                                         <span>
                                             📞 Phone:
-                                            <strong>
-                                                {{ job[8] }}
-                                            </strong>
+                                            <strong>{{ job[8] }}</strong>
                                         </span>
 
                                         |
 
                                         <span>
                                             🕒 Preferred Slot:
-                                            <strong>
-                                                {{ job[5] }}
-                                            </strong>
+                                            <strong>{{ job[5] }}</strong>
                                         </span>
 
                                     </div>
@@ -488,32 +493,34 @@
 
 
                             <!-- =================================================
-                                 UPDATE STATUS
+                                 UPDATE STATUS AND WORK DETAILS
                             ================================================== -->
-                            <div class="complaint-card-footer"
-                                 style="
-                                     display: flex;
-                                     justify-content: space-between;
-                                     align-items: center;
-                                     gap: 10px;
-                                 ">
+
+                            <div class="complaint-card-footer task-update-footer">
 
 
-                                <span class="status-indicator-text">
+                                <!-- CURRENT STATUS -->
 
-                                    Current Status:
+                                <div class="task-current-status">
 
-                                    <strong>
-                                        {{ job[4] }}
-                                    </strong>
+                                    <span class="status-indicator-text">
+                                        Current Status:
+                                        <strong>{{ job[4] }}</strong>
+                                    </span>
 
-                                </span>
+                                </div>
 
+
+                                <!-- WORK UPDATE FORM -->
 
                                 <form
-                                    action="{{ url_for('update_task_status') }}"
                                     method="POST"
+                                    action="{{ url_for('update_task_status') }}"
+                                    enctype="multipart/form-data"
+                                    class="task-update-form"
                                 >
+
+                                    <!-- COMPLAINT ID -->
 
                                     <input
                                         type="hidden"
@@ -521,6 +528,55 @@
                                         value="{{ job[0] }}"
                                     >
 
+
+                                    <!-- DESCRIPTION AND IMAGE -->
+
+                                    <div class="work-update-fields">
+
+
+                                        <!-- WORK DESCRIPTION -->
+
+                                        <div class="work-field">
+
+                                            <label for="work-description-{{ job[0] }}">
+                                                Work Description
+                                            </label>
+
+                                            <textarea
+                                                id="work-description-{{ job[0] }}"
+                                                name="description"
+                                                placeholder="Describe the work completed..."
+                                                rows="4"
+                                            ></textarea>
+
+                                        </div>
+
+
+                                        <!-- WORK IMAGE -->
+
+                                        <div class="work-field">
+
+                                            <label for="work-image-{{ job[0] }}">
+                                                Work Image
+                                            </label>
+
+                                            <input
+                                                type="file"
+                                                id="work-image-{{ job[0] }}"
+                                                name="work_image"
+                                                accept="image/png,image/jpeg,image/webp"
+                                            >
+
+                                            <small class="work-image-hint">
+                                                Upload a photo showing the work progress or completed repair.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- STATUS BUTTONS -->
 
                                     {% if job[9] == 'Re-opened'
                                           or job[4] == 'Assigned' %}
@@ -533,7 +589,7 @@
 
                                         <button
                                             type="submit"
-                                            class="btn-primary"
+                                            class="btn-primary task-status-button"
                                         >
                                             Start / Re-start Work
                                         </button>
@@ -549,10 +605,7 @@
 
                                         <button
                                             type="submit"
-                                            class="btn-primary"
-                                            style="
-                                                background: var(--success);
-                                            "
+                                            class="btn-primary task-status-button task-complete-button"
                                         >
                                             Mark Job Completed
                                         </button>
@@ -578,9 +631,7 @@
                          color: var(--text-muted);
                          padding: 30px;
                      ">
-
                     You have no active ongoing jobs.
-
                 </div>
 
             {% endif %}
