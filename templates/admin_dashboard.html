@@ -9,6 +9,16 @@
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .admin-nav-link {
+            cursor: pointer;
+        }
+
+        .admin-section-hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 
 
@@ -91,22 +101,155 @@
 
         <ul class="sidebar-menu">
 
+            <!-- OVERVIEW -->
 
             <li>
-
-                <a href="{{ url_for('admin_dashboard') }}"
-                   class="active">
+                <a href="javascript:void(0);"
+                   class="admin-nav-link active"
+                   onclick="showAdminSection('overview', this)">
 
                     📊
 
                     <span>
-                        Admin Dashboard
+                        Overview
                     </span>
 
                 </a>
-
             </li>
 
+
+            <!-- NOTIFICATIONS -->
+
+            <li>
+                <a href="{{ url_for('admin_notifications') }}">
+
+                    🔔
+
+                    <span>
+                        Notifications
+                    </span>
+
+                    {% if admin_unread_notification_count > 0 %}
+
+                        <span style="
+                            background: var(--danger);
+                            color: white;
+                            border-radius: 50%;
+                            padding: 2px 7px;
+                            font-size: 0.75rem;
+                            margin-left: auto;
+                        ">
+
+                            {{ admin_unread_notification_count }}
+
+                        </span>
+
+                    {% endif %}
+
+                </a>
+            </li>
+
+
+            <!-- COMPLAINT DISPATCH -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('dispatch', this)">
+
+                    🛠️
+
+                    <span>
+                        Complaint Dispatch
+                    </span>
+
+                </a>
+            </li>
+
+
+            <!-- REPEATED COMPLAINTS -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('duplicates', this)">
+
+                    🔁
+
+                    <span>
+                        Repeated Complaints
+                    </span>
+
+                </a>
+            </li>
+
+
+            <!-- UNASSIGNED -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('unassigned', this)">
+
+                    📋
+
+                    <span>
+                        Unassigned Complaints
+                    </span>
+
+                </a>
+            </li>
+
+
+            <!-- RESIDENTS -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('residents', this)">
+
+                    👥
+
+                    <span>
+                        Residents
+                    </span>
+
+                </a>
+            </li>
+
+
+            <!-- TECHNICIANS -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('technicians', this)">
+
+                    👷
+
+                    <span>
+                        Technicians
+                    </span>
+
+                </a>
+            </li>
+
+
+            <!-- REPORTS -->
+
+            <li>
+                <a href="javascript:void(0);"
+                   class="admin-nav-link"
+                   onclick="showAdminSection('reports', this)">
+
+                    📈
+
+                    <span>
+                        Reports &amp; Analytics
+                    </span>
+
+                </a>
+            </li>
 
         </ul>
 
@@ -115,7 +258,6 @@
         <!-- LOGGED-IN ADMIN -->
 
         <div class="sidebar-user">
-
 
             <div class="user-name">
 
@@ -142,7 +284,6 @@
                 Logout
 
             </a>
-
 
         </div>
 
@@ -184,7 +325,8 @@
              SYSTEM OVERVIEW
         ================================================== -->
 
-        <section style="margin-bottom: 40px;">
+        <section id="overview"
+                 style="margin-bottom: 40px;">
 
 
             <h3 style="
@@ -197,6 +339,8 @@
             </h3>
 
 
+
+            <!-- STATISTICS -->
 
             <div style="
                 display: grid;
@@ -308,144 +452,146 @@
             </div>
 
 
-        </section>
 
+            <!-- =================================================
+                 REGISTER NEW ADMINISTRATOR
+            ================================================== -->
 
-
-        <!-- =================================================
-             SECTION 2
-             REGISTER ADMIN
-        ================================================== -->
-
-        <section style="margin-bottom: 40px;">
-
-
-            <h3 style="
-                margin-bottom: 15px;
-                color: var(--text-main);
+            <div style="
+                margin-top: 30px;
+                margin-bottom: 40px;
             ">
 
-                👤 Register New Administrator
 
-            </h3>
+                <h3 style="
+                    margin-bottom: 15px;
+                    color: var(--text-main);
+                ">
 
+                    👤 Register New Administrator
 
-
-            <div class="card">
-
-
-                <form
-                    action="{{ url_for('create_admin') }}"
-                    method="POST"
-                >
-
-
-                    {% if csrf_token is defined %}
-
-                        <input
-                            type="hidden"
-                            name="csrf_token"
-                            value="{{ csrf_token() }}"
-                        >
-
-                    {% endif %}
+                </h3>
 
 
 
-                    <div style="
-                        display: grid;
-                        grid-template-columns:
-                            repeat(auto-fit, minmax(200px, 1fr));
-                        gap: 15px;
-                        align-items: end;
-                    ">
+                <div class="card">
 
 
-                        <!-- NAME -->
+                    <form
+                        action="{{ url_for('create_admin') }}"
+                        method="POST"
+                    >
 
-                        <div class="form-group"
-                             style="margin-bottom: 0;">
 
-                            <label for="admin-name">
-
-                                Full Name
-
-                            </label>
+                        {% if csrf_token is defined %}
 
                             <input
-                                type="text"
-                                id="admin-name"
-                                name="name"
-                                placeholder="Administrator Name"
-                                required
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
                             >
+
+                        {% endif %}
+
+
+
+                        <div style="
+                            display: grid;
+                            grid-template-columns:
+                                repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 15px;
+                            align-items: end;
+                        ">
+
+
+                            <!-- NAME -->
+
+                            <div class="form-group"
+                                 style="margin-bottom: 0;">
+
+                                <label for="admin-name">
+
+                                    Full Name
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="admin-name"
+                                    name="name"
+                                    placeholder="Administrator Name"
+                                    required
+                                >
+
+                            </div>
+
+
+
+                            <!-- USERNAME -->
+
+                            <div class="form-group"
+                                 style="margin-bottom: 0;">
+
+                                <label for="admin-username">
+
+                                    Username / Email
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="admin-username"
+                                    name="username"
+                                    placeholder="admin@example.com"
+                                    required
+                                >
+
+                            </div>
+
+
+
+                            <!-- PASSWORD -->
+
+                            <div class="form-group"
+                                 style="margin-bottom: 0;">
+
+                                <label for="admin-password">
+
+                                    Password
+
+                                </label>
+
+                                <input
+                                    type="password"
+                                    id="admin-password"
+                                    name="password"
+                                    placeholder="Enter password"
+                                    required
+                                >
+
+                            </div>
+
+
+
+                            <!-- CREATE -->
+
+                            <button
+                                type="submit"
+                                class="btn-primary"
+                            >
+
+                                Create Administrator
+
+                            </button>
+
 
                         </div>
 
 
-
-                        <!-- USERNAME -->
-
-                        <div class="form-group"
-                             style="margin-bottom: 0;">
-
-                            <label for="admin-username">
-
-                                Username / Email
-
-                            </label>
-
-                            <input
-                                type="text"
-                                id="admin-username"
-                                name="username"
-                                placeholder="admin@example.com"
-                                required
-                            >
-
-                        </div>
+                    </form>
 
 
-
-                        <!-- PASSWORD -->
-
-                        <div class="form-group"
-                             style="margin-bottom: 0;">
-
-                            <label for="admin-password">
-
-                                Password
-
-                            </label>
-
-                            <input
-                                type="password"
-                                id="admin-password"
-                                name="password"
-                                placeholder="Enter password"
-                                required
-                            >
-
-                        </div>
-
-
-
-                        <!-- CREATE -->
-
-                        <button
-                            type="submit"
-                            class="btn-primary"
-                        >
-
-                            Create Administrator
-
-                        </button>
-
-
-                    </div>
-
-
-                </form>
+                </div>
 
 
             </div>
@@ -456,11 +602,13 @@
 
 
         <!-- =================================================
-             SECTION 3
+             SECTION 2
              COMPLAINT DISPATCH
         ================================================== -->
 
-        <section style="margin-bottom: 40px;">
+        <section id="dispatch"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
 
 
             <h3 style="
@@ -495,7 +643,244 @@
                  ">
 
 
-                <table>
+                <!-- =================================================
+                     FR-84 FILTERS
+                ================================================== -->
+
+                <div class="card"
+                     style="margin-bottom: 20px;">
+
+
+                    <h4 style="
+                        margin-bottom: 15px;
+                        color: var(--text-main);
+                    ">
+
+                        🔎 Filter Complaints
+
+                    </h4>
+
+
+
+                    <div style="
+                        display: grid;
+                        grid-template-columns:
+                            repeat(auto-fit, minmax(180px, 1fr));
+                        gap: 15px;
+                        align-items: end;
+                    ">
+
+
+                        <!-- CATEGORY -->
+
+                        <div>
+
+                            <label style="
+                                display: block;
+                                margin-bottom: 6px;
+                                color: var(--text-main);
+                                font-weight: 600;
+                            ">
+
+                                Category
+
+                            </label>
+
+                            <select
+                                id="complaintCategoryFilter"
+                                style="
+                                    width: 100%;
+                                    padding: 10px;
+                                "
+                            >
+
+                                <option value="">
+                                    All Categories
+                                </option>
+
+                                <option value="Electrical">
+                                    Electrical
+                                </option>
+
+                                <option value="Plumbing">
+                                    Plumbing
+                                </option>
+
+                                <option value="Carpentry">
+                                    Carpentry
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- PRIORITY -->
+
+                        <div>
+
+                            <label style="
+                                display: block;
+                                margin-bottom: 6px;
+                                color: var(--text-main);
+                                font-weight: 600;
+                            ">
+
+                                Priority
+
+                            </label>
+
+                            <select
+                                id="complaintPriorityFilter"
+                                style="
+                                    width: 100%;
+                                    padding: 10px;
+                                "
+                            >
+
+                                <option value="">
+                                    All Priorities
+                                </option>
+
+                                <option value="High">
+                                    High
+                                </option>
+
+                                <option value="Medium">
+                                    Medium
+                                </option>
+
+                                <option value="Low">
+                                    Low
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div>
+
+                            <label style="
+                                display: block;
+                                margin-bottom: 6px;
+                                color: var(--text-main);
+                                font-weight: 600;
+                            ">
+
+                                Status
+
+                            </label>
+
+                            <select
+                                id="complaintStatusFilter"
+                                style="
+                                    width: 100%;
+                                    padding: 10px;
+                                "
+                            >
+
+                                <option value="">
+                                    All Statuses
+                                </option>
+
+                                <option value="Submitted">
+                                    Submitted
+                                </option>
+
+                                <option value="Offered">
+                                    Offered
+                                </option>
+
+                                <option value="Assigned">
+                                    Assigned
+                                </option>
+
+                                <option value="In Progress">
+                                    In Progress
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                                <option value="Pending Worker">
+                                    Pending Worker
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- DATE -->
+
+                        <div>
+
+                            <label style="
+                                display: block;
+                                margin-bottom: 6px;
+                                color: var(--text-main);
+                                font-weight: 600;
+                            ">
+
+                                Date
+
+                            </label>
+
+                            <input
+                                type="date"
+                                id="complaintDateFilter"
+                                style="
+                                    width: 100%;
+                                    padding: 9px;
+                                "
+                            >
+
+                        </div>
+
+
+
+                        <!-- CLEAR -->
+
+                        <div>
+
+                            <button
+                                type="button"
+                                onclick="clearComplaintFilters()"
+                                style="
+                                    width: 100%;
+                                    padding: 10px;
+                                    border: none;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                "
+                            >
+
+                                Clear Filters
+
+                            </button>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     COMPLAINT TABLE
+                ================================================== -->
+
+                <table id="complaintDispatchTable">
 
 
                     <thead>
@@ -511,6 +896,10 @@
                             <th>Priority</th>
 
                             <th>Status</th>
+
+                            <th>Completed Date</th>
+
+                            <th>Turnaround Time</th>
 
                             <th>Assigned Worker</th>
 
@@ -530,7 +919,12 @@
                         {% for c in complaints %}
 
 
-                        <tr>
+                        <tr
+                            data-category="{{ c[2] }}"
+                            data-priority="{{ c[3] }}"
+                            data-status="{{ c[4] }}"
+                            data-date="{{ c[7] }}"
+                        >
 
 
                             <!-- ID -->
@@ -573,13 +967,71 @@
 
                             <td>
 
+                                {% if c[4] not in ['Resolved', 'Completed'] %}
 
-                                <span class="badge {{ c[3] }}">
+                                    <form
+                                        action="{{ url_for('admin_update_priority') }}"
+                                        method="POST"
+                                        style="
+                                            display: inline-flex;
+                                            align-items: center;
+                                            gap: 4px;
+                                        "
+                                    >
 
-                                    {{ c[3] }}
+                                        <input
+                                            type="hidden"
+                                            name="complaint_id"
+                                            value="{{ c[0] }}"
+                                        >
 
-                                </span>
 
+                                        <select
+                                            name="priority"
+                                            onchange="this.form.submit()"
+                                            style="
+                                                padding: 4px 8px;
+                                                font-size: 0.8rem;
+                                                font-weight: 600;
+                                                border-radius: 6px;
+                                                border: 1px solid var(--border-color);
+                                                cursor: pointer;
+                                            "
+                                            title="Click to alter complaint priority"
+                                        >
+
+                                            <option
+                                                value="Low"
+                                                {% if c[3] == 'Low' %}selected{% endif %}
+                                            >
+                                                Low
+                                            </option>
+
+                                            <option
+                                                value="Medium"
+                                                {% if c[3] == 'Medium' %}selected{% endif %}
+                                            >
+                                                Medium
+                                            </option>
+
+                                            <option
+                                                value="High"
+                                                {% if c[3] == 'High' %}selected{% endif %}
+                                            >
+                                                High
+                                            </option>
+
+                                        </select>
+
+                                    </form>
+
+                                {% else %}
+
+                                    <span class="badge {{ c[3] }}">
+                                        {{ c[3] }}
+                                    </span>
+
+                                {% endif %}
 
                             </td>
 
@@ -599,10 +1051,45 @@
 
 
 
-                            <!-- WORKER -->
+                            <!-- COMPLETED DATE -->
 
                             <td>
 
+                                {% if c[8] %}
+
+                                    {{ c[8] }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- TURNAROUND TIME -->
+
+                            <td>
+
+                                {% if c[8] and c[7] %}
+
+                                    {{ c[8] - c[7] }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- WORKER -->
+
+                            <td>
 
                                 {% if c[5] %}
 
@@ -622,7 +1109,6 @@
 
                                 {% endif %}
 
-
                             </td>
 
 
@@ -630,7 +1116,6 @@
                             <!-- ALLOCATION METHOD -->
 
                             <td>
-
 
                                 {% if c[5] %}
 
@@ -657,7 +1142,6 @@
 
                                 {% endif %}
 
-
                             </td>
 
 
@@ -666,9 +1150,7 @@
 
                             <td>
 
-
                                 {% if c[4] not in ['Resolved', 'Completed'] %}
-
 
                                     <form
                                         action="{{ url_for('assign_worker') }}"
@@ -679,7 +1161,6 @@
                                             align-items: center;
                                         "
                                     >
-
 
                                         {% if csrf_token is defined %}
 
@@ -714,15 +1195,12 @@
                                         >
 
                                             <option value="">
-
                                                 Select Technician
-
                                             </option>
 
 
 
                                             {% for s in available_staff %}
-
 
                                                 {% set category_match =
                                                     c[6] if c|length > 6 else c[2]
@@ -736,7 +1214,6 @@
                                                     category_match|lower
                                                 %}
 
-
                                                     <option
                                                         value="{{ s[0] }}"
                                                     >
@@ -748,21 +1225,20 @@
                                                         {{ s[2] }}
 
                                                         (
+
                                                         {{
                                                             'Available'
                                                             if s[3] in [1, True, '1']
                                                             else 'Busy'
                                                         }}
+
                                                         )
 
                                                     </option>
 
-
                                                 {% endif %}
 
-
                                             {% endfor %}
-
 
                                         </select>
 
@@ -782,12 +1258,9 @@
 
                                         </button>
 
-
                                     </form>
 
-
                                 {% else %}
-
 
                                     <span style="
                                         color: var(--success);
@@ -799,9 +1272,7 @@
 
                                     </span>
 
-
                                 {% endif %}
-
 
                             </td>
 
@@ -815,7 +1286,7 @@
                         <tr>
 
                             <td
-                                colspan="8"
+                                colspan="10"
                                 style="
                                     text-align: center;
                                     color: var(--text-muted);
@@ -847,21 +1318,35 @@
 
 
         <!-- =================================================
-             SECTION 4
-             TECHNICIAN ROSTER
+             SECTION 3
+             REPEATED COMPLAINT ALERTS
         ================================================== -->
 
-        <section>
+        <section id="duplicates"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
 
 
             <h3 style="
-                margin-bottom: 15px;
+                margin-bottom: 8px;
                 color: var(--text-main);
             ">
 
-                👷 Maintenance Technician Roster
+                🔎 Repeated Complaint Alerts
 
             </h3>
+
+
+            <p style="
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            ">
+
+                Review complaints flagged as possible duplicates.
+                These alerts do not automatically reject complaints.
+
+            </p>
 
 
 
@@ -872,22 +1357,137 @@
                  ">
 
 
-                <table>
+                <!-- =================================================
+                     FR-83
+                ================================================== -->
 
+                <div class="card"
+                     style="margin-bottom: 20px;">
+
+
+                    <h4 style="
+                        margin-bottom: 15px;
+                        color: var(--text-main);
+                    ">
+
+                        📊 Recurring Complaint Summary
+
+                    </h4>
+
+
+                    <p style="
+                        color: var(--text-muted);
+                        font-size: 0.9rem;
+                        margin-bottom: 15px;
+                    ">
+
+                        Categories with more than one complaint are shown
+                        below to identify recurring complaint patterns.
+
+                    </p>
+
+
+
+                    {% if recurring_complaints %}
+
+
+                        <div style="
+                            display: grid;
+                            grid-template-columns:
+                                repeat(auto-fit, minmax(180px, 1fr));
+                            gap: 15px;
+                        ">
+
+
+                            {% for category, count in recurring_complaints %}
+
+
+                                <div style="
+                                    padding: 18px;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: 10px;
+                                    text-align: center;
+                                ">
+
+
+                                    <div style="
+                                        font-size: 1.5rem;
+                                        font-weight: 700;
+                                        color: var(--primary);
+                                    ">
+
+                                        {{ count }}
+
+                                    </div>
+
+
+                                    <div style="
+                                        margin-top: 5px;
+                                        color: var(--text-main);
+                                        font-weight: 600;
+                                    ">
+
+                                        {{ category }}
+
+                                    </div>
+
+
+                                    <div style="
+                                        margin-top: 4px;
+                                        color: var(--text-muted);
+                                        font-size: 0.8rem;
+                                    ">
+
+                                        complaints
+
+                                    </div>
+
+
+                                </div>
+
+
+                            {% endfor %}
+
+
+                        </div>
+
+
+                    {% else %}
+
+
+                        <p style="
+                            color: var(--text-muted);
+                            margin: 0;
+                        ">
+
+                            No recurring complaint categories found.
+
+                        </p>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                <!-- DUPLICATE ALERT TABLE -->
+
+                <table>
 
                     <thead>
 
                         <tr>
 
-                            <th>Staff ID</th>
-
-                            <th>Name</th>
-
-                            <th>Category Domain</th>
-
-                            <th>Skill Rating</th>
-
-                            <th>Current Availability</th>
+                            <th>Alert ID</th>
+                            <th>New Complaint</th>
+                            <th>Earlier Matching Complaint</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Resident</th>
+                            <th>Alert Date</th>
+                            <th>Review Status</th>
 
                         </tr>
 
@@ -898,87 +1498,106 @@
                     <tbody>
 
 
-                        {% for s in staff_list %}
+                        {% for a in duplicate_alerts %}
 
 
                         <tr>
 
-
-                            <!-- STAFF ID -->
-
                             <td>
-
-                                <strong>
-                                    #{{ s[0] }}
-                                </strong>
-
+                                #{{ a[0] }}
                             </td>
 
-
-
-                            <!-- NAME -->
-
                             <td>
-
-                                {{ s[1] }}
-
+                                <strong>#{{ a[1] }}</strong>
                             </td>
 
-
-
-                            <!-- DOMAIN -->
+                            <td>
+                                <strong>#{{ a[2] }}</strong>
+                            </td>
 
                             <td>
 
                                 <span class="badge category-badge">
-
-                                    {{ s[2] }}
-
+                                    {{ a[3] }}
                                 </span>
 
                             </td>
 
+                            <td>
+                                {{ a[4] }}
+                            </td>
 
-
-                            <!-- SKILL -->
+                            <td>
+                                {{ a[5] }}
+                            </td>
 
                             <td>
 
-                                Level {{ s[3] }}
+                                {{ a[6].strftime('%d-%m-%Y %I:%M %p')
+                                   if a[6] else 'N/A' }}
 
                             </td>
 
-
-
-                            <!-- AVAILABILITY -->
-
                             <td>
 
 
-                                {% if s[4] in [1, True, '1'] %}
+                                {% if a[7] == 'Unread' %}
 
 
-                                    <span
-                                        class="badge"
-                                        style="
-                                            background: #d1fae5;
-                                            color: #065f46;
-                                        "
+                                    <span class="badge High">
+                                        Unread
+                                    </span>
+
+
+                                    <form
+                                        action="{{ url_for('admin_review_duplicate_alert') }}"
+                                        method="POST"
+                                        style="margin-top: 8px;"
                                     >
 
-                                        Available
 
-                                    </span>
+                                        {% if csrf_token is defined %}
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
+                                        {% endif %}
+
+
+                                        <input
+                                            type="hidden"
+                                            name="alert_id"
+                                            value="{{ a[0] }}"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn-primary"
+                                            style="
+                                                width: auto;
+                                                padding: 6px 10px;
+                                                font-size: 0.8rem;
+                                            "
+                                        >
+
+                                            Mark as Reviewed
+
+                                        </button>
+
+
+                                    </form>
 
 
                                 {% else %}
 
 
-                                    <span
-                                        class="badge High"
-                                    >
+                                    <span class="badge">
 
-                                        Busy
+                                        {{ a[7] }}
 
                                     </span>
 
@@ -987,7 +1606,6 @@
 
 
                             </td>
-
 
                         </tr>
 
@@ -998,7 +1616,7 @@
                         <tr>
 
                             <td
-                                colspan="5"
+                                colspan="8"
                                 style="
                                     text-align: center;
                                     color: var(--text-muted);
@@ -1006,7 +1624,7 @@
                                 "
                             >
 
-                                No technicians registered.
+                                No possible duplicate complaints detected.
 
                             </td>
 
@@ -1028,10 +1646,1289 @@
         </section>
 
 
+
+        <!-- =================================================
+             SECTION 4
+             UNASSIGNED COMPLAINTS
+        ================================================== -->
+
+        <section id="unassigned"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 8px;
+                color: var(--text-main);
+            ">
+
+                📋 Unassigned Complaints
+
+            </h3>
+
+
+            <p style="
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            ">
+
+                View complaints that currently do not have
+                a maintenance worker assigned.
+
+            </p>
+
+
+
+            <div class="card"
+                 style="
+                     padding: 0;
+                     overflow-x: auto;
+                 ">
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Complaint ID</th>
+                            <th>Resident</th>
+                            <th>Category</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Created Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        {% for c in unassigned_complaints %}
+
+
+                        <tr>
+
+                            <td>
+                                <strong>#{{ c[0] }}</strong>
+                            </td>
+
+
+                            <td>
+                                {{ c[1] }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge category-badge">
+                                    {{ c[2] }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge {{ c[3] }}">
+                                    {{ c[3] }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge status-pill">
+                                    {{ c[4] }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                {{ c[5] }}
+                            </td>
+
+
+                            <td>
+
+                                {{ c[6].strftime('%d-%m-%Y %I:%M %p')
+                                   if c[6] else 'N/A' }}
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% else %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                style="
+                                    text-align: center;
+                                    color: var(--text-muted);
+                                    padding: 30px;
+                                "
+                            >
+
+                                No unassigned complaints.
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 5
+             RESIDENT INFORMATION
+        ================================================== -->
+
+        <section id="residents"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+
+                🏠 Resident Information
+
+            </h3>
+
+
+            <p style="
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            ">
+
+                View registered resident details
+                and residential information.
+
+            </p>
+
+
+
+            <div class="card"
+                 style="
+                     padding: 0;
+                     overflow-x: auto;
+                 ">
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Resident ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Apartment</th>
+                            <th>Block</th>
+                            <th>Floor</th>
+                            <th>Account Status</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        {% for r in resident_list %}
+
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    #{{ r[0] }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+                                {{ r[1] }}
+                            </td>
+
+
+                            <td>
+                                {{ r[2] }}
+                            </td>
+
+
+                            <td>
+                                {{ r[3] if r[3] else 'N/A' }}
+                            </td>
+
+
+                            <td>
+                                {{ r[4] if r[4] else 'N/A' }}
+                            </td>
+
+
+                            <td>
+                                {{ r[5] if r[5] else 'N/A' }}
+                            </td>
+
+
+                            <td>
+                                {{ r[6] if r[6] is not none else 'N/A' }}
+                            </td>
+
+
+                            <td>
+
+
+                                <form
+                                    id="resident-status-form-{{ r[0] }}"
+                                    action="{{ url_for('admin_update_account_status') }}"
+                                    method="POST"
+                                >
+
+
+                                    <input
+                                        type="hidden"
+                                        name="user_type"
+                                        value="resident"
+                                    >
+
+
+                                    <input
+                                        type="hidden"
+                                        name="user_id"
+                                        value="{{ r[0] }}"
+                                    >
+
+
+                                    <select
+                                        name="account_status"
+                                        form="resident-status-form-{{ r[0] }}"
+                                    >
+
+
+                                        <option
+                                            value="ACTIVE"
+                                            {% if r[7] == 'ACTIVE' %}selected{% endif %}
+                                        >
+                                            ACTIVE
+                                        </option>
+
+
+                                        <option
+                                            value="INACTIVE"
+                                            {% if r[7] == 'INACTIVE' %}selected{% endif %}
+                                        >
+                                            INACTIVE
+                                        </option>
+
+
+                                    </select>
+
+
+                                </form>
+
+
+                            </td>
+
+
+                            <td>
+
+
+                                <button
+                                    type="submit"
+                                    form="resident-status-form-{{ r[0] }}"
+                                    class="btn-primary"
+                                    style="
+                                        width: auto;
+                                        padding: 6px 12px;
+                                        font-size: 0.8rem;
+                                    "
+                                >
+
+                                    Update
+
+                                </button>
+
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% else %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="9"
+                                style="
+                                    text-align: center;
+                                    color: var(--text-muted);
+                                    padding: 30px;
+                                "
+                            >
+
+                                No residents registered.
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 6
+             TECHNICIAN ROSTER
+        ================================================== -->
+
+        <section id="technicians"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 8px;
+                color: var(--text-main);
+            ">
+
+                👷 Maintenance Technician Roster
+
+            </h3>
+
+
+            <p style="
+                margin-bottom: 20px;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            ">
+
+                View registered maintenance worker information,
+                skills, availability, and current workload.
+
+            </p>
+
+
+
+            <div class="card"
+                 style="
+                     padding: 0;
+                     overflow-x: auto;
+                 ">
+
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Staff ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Category Domain</th>
+                            <th>Skill Rating</th>
+                            <th>Availability</th>
+                            <th>Current Workload</th>
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <tbody>
+
+
+                        {% for s in staff_list %}
+
+
+                        <tr>
+
+                            <td>
+
+                                <strong>
+                                    #{{ s[0] }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+                                {{ s[1] }}
+                            </td>
+
+
+                            <td>
+                                {{ s[2] }}
+                            </td>
+
+
+                            <td>
+                                {{ s[3] if s[3] else 'N/A' }}
+                            </td>
+
+
+                            <td>
+
+                                <span class="badge category-badge">
+
+                                    {{ s[4] if s[4] else 'N/A' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <select
+                                    name="skill_level"
+                                    form="worker-form-{{ s[0] }}"
+                                    style="
+                                        padding: 6px;
+                                        border: 1px solid var(--border-color);
+                                        border-radius: 6px;
+                                    "
+                                >
+
+
+                                    <option
+                                        value="Standard"
+                                        {% if s[5] == 'Standard' %}selected{% endif %}
+                                    >
+                                        Standard
+                                    </option>
+
+
+                                    <option
+                                        value="Intermediate"
+                                        {% if s[5] == 'Intermediate' %}selected{% endif %}
+                                    >
+                                        Intermediate
+                                    </option>
+
+
+                                    <option
+                                        value="Expert"
+                                        {% if s[5] == 'Expert' %}selected{% endif %}
+                                    >
+                                        Expert
+                                    </option>
+
+
+                                </select>
+
+                            </td>
+
+
+                            <td>
+
+                                <select
+                                    name="availability_status"
+                                    form="worker-form-{{ s[0] }}"
+                                    style="
+                                        padding: 6px;
+                                        border: 1px solid var(--border-color);
+                                        border-radius: 6px;
+                                    "
+                                >
+
+
+                                    <option
+                                        value="AVAILABLE"
+                                        {% if s[6]|upper == 'AVAILABLE' %}selected{% endif %}
+                                    >
+                                        Available
+                                    </option>
+
+
+                                    <option
+                                        value="UNAVAILABLE"
+                                        {% if s[6]|upper == 'UNAVAILABLE' %}selected{% endif %}
+                                    >
+                                        Unavailable
+                                    </option>
+
+
+                                </select>
+
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    {{ s[7] }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                <form
+                                    id="worker-form-{{ s[0] }}"
+                                    action="{{ url_for('admin_update_worker') }}"
+                                    method="POST"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="staff_id"
+                                        value="{{ s[0] }}"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn-primary"
+                                        style="
+                                            width: auto;
+                                            padding: 6px 12px;
+                                            font-size: 0.8rem;
+                                        "
+                                    >
+
+                                        Update
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+
+                        </tr>
+
+
+                        {% else %}
+
+
+                        <tr>
+
+                            <td
+                                colspan="9"
+                                style="
+                                    text-align: center;
+                                    color: var(--text-muted);
+                                    padding: 30px;
+                                "
+                            >
+
+                                No technicians registered.
+
+                            </td>
+
+                        </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SECTION 7
+             REPORTS & ANALYTICS
+        ================================================== -->
+
+        <section id="reports"
+                 class="admin-section-hidden"
+                 style="margin-bottom: 40px;">
+
+
+            <h3 style="
+                margin-bottom: 15px;
+                color: var(--text-main);
+            ">
+
+                📈 Reports & Analytics
+
+            </h3>
+
+
+
+            <div class="card">
+
+
+                <!-- CATEGORY REPORT -->
+
+                <div style="margin-bottom: 30px;">
+
+                    <h4>
+                        📊 Complaints by Category
+                    </h4>
+
+
+                    {% if category_report %}
+
+
+                        <table style="
+                            width: 100%;
+                            margin-top: 15px;
+                        ">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Category
+                                    </th>
+
+                                    <th>
+                                        Total Complaints
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for category, count in category_report %}
+
+
+                                <tr>
+
+                                    <td>
+                                        {{ category }}
+                                    </td>
+
+                                    <td>
+                                        {{ count }}
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+
+                    {% else %}
+
+
+                        <p>
+                            No category data available.
+                        </p>
+
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- STATUS REPORT -->
+
+                <div style="margin-bottom: 30px;">
+
+                    <h4>
+                        📋 Complaints by Status
+                    </h4>
+
+
+                    {% if status_report %}
+
+
+                        <table style="
+                            width: 100%;
+                            margin-top: 15px;
+                        ">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Total Complaints
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for status, count in status_report %}
+
+
+                                <tr>
+
+                                    <td>
+                                        {{ status }}
+                                    </td>
+
+                                    <td>
+                                        {{ count }}
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+
+                    {% else %}
+
+
+                        <p>
+                            No status data available.
+                        </p>
+
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- PRIORITY REPORT -->
+
+                <div>
+
+                    <h4>
+                        ⚠️ Complaints by Priority
+                    </h4>
+
+
+                    {% if priority_report %}
+
+
+                        <table style="
+                            width: 100%;
+                            margin-top: 15px;
+                        ">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Priority
+                                    </th>
+
+                                    <th>
+                                        Total Complaints
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                {% for priority, count in priority_report %}
+
+
+                                <tr>
+
+                                    <td>
+                                        {{ priority }}
+                                    </td>
+
+                                    <td>
+                                        {{ count }}
+                                    </td>
+
+                                </tr>
+
+
+                                {% endfor %}
+
+
+                            </tbody>
+
+                        </table>
+
+
+                    {% else %}
+
+
+                        <p>
+                            No priority data available.
+                        </p>
+
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
     </main>
 
 
 </div>
+
+
+
+<!-- =========================================================
+     SIDEBAR SECTION SWITCHING + FILTERS
+========================================================= -->
+
+<script>
+
+
+function showAdminSection(sectionId, clickedLink) {
+
+
+    const sections = [
+
+        'overview',
+
+        'dispatch',
+
+        'duplicates',
+
+        'unassigned',
+
+        'residents',
+
+        'technicians',
+
+        'reports'
+
+    ];
+
+
+    sections.forEach(function(id) {
+
+
+        const section =
+            document.getElementById(id);
+
+
+        if (section) {
+
+            section.classList.add(
+                'admin-section-hidden'
+            );
+
+        }
+
+    });
+
+
+    const selectedSection =
+        document.getElementById(sectionId);
+
+
+    if (selectedSection) {
+
+        selectedSection.classList.remove(
+            'admin-section-hidden'
+        );
+
+    }
+
+
+    document
+        .querySelectorAll('.admin-nav-link')
+        .forEach(function(link) {
+
+            link.classList.remove('active');
+
+        });
+
+
+    if (clickedLink) {
+
+        clickedLink.classList.add('active');
+
+    }
+
+}
+
+
+
+/* =========================================================
+   OPEN CORRECT SECTION FROM HASH
+========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+
+        const hash =
+            window.location.hash.substring(1);
+
+
+        const validSections = [
+
+            'overview',
+            'dispatch',
+            'duplicates',
+            'unassigned',
+            'residents',
+            'technicians',
+            'reports'
+
+        ];
+
+
+        if (validSections.includes(hash)) {
+
+
+            const link =
+                document.querySelector(
+                    '.admin-nav-link[onclick*="' +
+                    hash +
+                    '"]'
+                );
+
+
+            showAdminSection(
+                hash,
+                link
+            );
+
+
+        } else {
+
+
+            showAdminSection(
+
+                'overview',
+
+                document.querySelector(
+                    '.admin-nav-link'
+                )
+
+            );
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   FR-84 COMPLAINT FILTERS
+========================================================= */
+
+function filterComplaints() {
+
+
+    const category =
+        document
+            .getElementById(
+                'complaintCategoryFilter'
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const priority =
+        document
+            .getElementById(
+                'complaintPriorityFilter'
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const status =
+        document
+            .getElementById(
+                'complaintStatusFilter'
+            )
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const selectedDate =
+        document
+            .getElementById(
+                'complaintDateFilter'
+            )
+            .value
+            .trim();
+
+
+    const rows =
+        document.querySelectorAll(
+            '#complaintDispatchTable tbody tr'
+        );
+
+
+    rows.forEach(function(row) {
+
+
+        /* Ignore empty-table row */
+
+        if (!row.dataset.category) {
+
+            return;
+
+        }
+
+
+        const rowCategory =
+            String(
+                row.dataset.category || ''
+            )
+            .trim()
+            .toLowerCase();
+
+
+        const rowPriority =
+            String(
+                row.dataset.priority || ''
+            )
+            .trim()
+            .toLowerCase();
+
+
+        const rowStatus =
+            String(
+                row.dataset.status || ''
+            )
+            .trim()
+            .toLowerCase();
+
+
+        const rawDate =
+            String(
+                row.dataset.date || ''
+            )
+            .trim();
+
+
+        const rowDate =
+            rawDate.substring(0, 10);
+
+
+        const categoryMatch =
+            !category ||
+            rowCategory === category;
+
+
+        const priorityMatch =
+            !priority ||
+            rowPriority === priority;
+
+
+        const statusMatch =
+            !status ||
+            rowStatus === status;
+
+
+        const dateMatch =
+            !selectedDate ||
+            rowDate === selectedDate;
+
+
+        if (
+            categoryMatch &&
+            priorityMatch &&
+            statusMatch &&
+            dateMatch
+        ) {
+
+            row.style.display = '';
+
+        } else {
+
+            row.style.display = 'none';
+
+        }
+
+    });
+
+}
+
+
+
+/* =========================================================
+   CLEAR FILTERS
+========================================================= */
+
+function clearComplaintFilters() {
+
+
+    document
+        .getElementById(
+            'complaintCategoryFilter'
+        )
+        .value = '';
+
+
+    document
+        .getElementById(
+            'complaintPriorityFilter'
+        )
+        .value = '';
+
+
+    document
+        .getElementById(
+            'complaintStatusFilter'
+        )
+        .value = '';
+
+
+    document
+        .getElementById(
+            'complaintDateFilter'
+        )
+        .value = '';
+
+
+    filterComplaints();
+
+}
+
+
+
+/* =========================================================
+   FILTER EVENT LISTENERS
+========================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+
+        document
+            .getElementById(
+                'complaintCategoryFilter'
+            )
+            .addEventListener(
+                'change',
+                filterComplaints
+            );
+
+
+        document
+            .getElementById(
+                'complaintPriorityFilter'
+            )
+            .addEventListener(
+                'change',
+                filterComplaints
+            );
+
+
+        document
+            .getElementById(
+                'complaintStatusFilter'
+            )
+            .addEventListener(
+                'change',
+                filterComplaints
+            );
+
+
+        document
+            .getElementById(
+                'complaintDateFilter'
+            )
+            .addEventListener(
+                'change',
+                filterComplaints
+            );
+
+    }
+);
+
+
+</script>
 
 
 </body>
