@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>TownSphere - Admin Notifications</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        .admin-nav-link {
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+<aside class="sidebar">
+
+    <div class="sidebar-brand">
+        TownSphere
+    </div>
+
+    <ul class="sidebar-menu">
+
+        <!-- OVERVIEW -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#overview">
+
+                📊
+
+                <span>
+                    Overview
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- NOTIFICATIONS -->
+        <li>
+            <a href="{{ url_for('admin_notifications') }}"
+               class="active">
+
+                🔔
+
+                <span>
+                    Notifications
+                </span>
+
+                {% if admin_unread_notification_count > 0 %}
+
+                    <span style="
+                        background: var(--danger);
+                        color: white;
+                        border-radius: 50%;
+                        padding: 2px 7px;
+                        font-size: 0.75rem;
+                        margin-left: auto;
+                    ">
+
+                        {{ admin_unread_notification_count }}
+
+                    </span>
+
+                {% endif %}
+
+            </a>
+        </li>
+
+
+        <!-- COMPLAINT DISPATCH -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#dispatch">
+
+                🛠️
+
+                <span>
+                    Complaint Dispatch
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- REPEATED COMPLAINTS -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#duplicates">
+
+                🔁
+
+                <span>
+                    Repeated Complaints
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- UNASSIGNED COMPLAINTS -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#unassigned">
+
+                📋
+
+                <span>
+                    Unassigned Complaints
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- RESIDENTS -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#residents">
+
+                👥
+
+                <span>
+                    Residents
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- TECHNICIANS -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#technicians">
+
+                👷
+
+                <span>
+                    Technicians
+                </span>
+
+            </a>
+        </li>
+
+
+        <!-- REPORTS -->
+        <li>
+            <a href="{{ url_for('admin_dashboard') }}#reports">
+
+                📈
+
+                <span>
+                    Reports &amp; Analytics
+                </span>
+
+            </a>
+        </li>
+
+    </ul>
+
+
+    <div class="sidebar-user">
+
+        <div class="user-name">
+            {{ session.get('name', 'Admin') }}
+        </div>
+
+        <div class="user-role">
+            Administrator
+        </div>
+
+        <a href="{{ url_for('logout') }}"
+           style="
+               color: var(--danger);
+               text-decoration: none;
+               font-size: 0.875rem;
+               font-weight: 600;
+           ">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <div class="content-header">
+
+
+            <h2>
+                🔔 Notifications
+            </h2>
+
+
+            <p style="color: var(--text-muted);">
+
+                Important complaint and assignment updates.
+
+            </p>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             NOTIFICATIONS
+        ================================================== -->
+
+        <section>
+
+
+            {% if notifications %}
+
+
+                {% for notification in notifications %}
+
+
+                    <div class="card notification-card
+                        {% if notification[5] == 'Unread' %}
+                            notification-unread
+                        {% else %}
+                            notification-read
+                        {% endif %}
+                    ">
+
+
+                        <div style="
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 20px;
+                            align-items: flex-start;
+                        ">
+
+
+                            <div style="flex: 1;">
+
+
+                                <div style="
+                                    font-weight: 700;
+                                    margin-bottom: 8px;
+                                ">
+
+                                    {{ notification[3] }}
+
+                                </div>
+
+
+                                <div style="
+                                    color: var(--text-muted);
+                                    font-size: 0.85rem;
+                                ">
+
+                                    Type:
+
+                                    {{ notification[2] }}
+
+
+                                    {% if notification[1] %}
+
+                                        |
+
+                                        Assignment:
+
+                                        #{{ notification[1] }}
+
+                                    {% endif %}
+
+
+                                    |
+
+                                    {{ notification[4] }}
+
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div>
+
+
+                                {% if notification[5] == 'Unread' %}
+
+
+                                    <form
+                                        method="POST"
+                                        action="{{
+                                            url_for(
+                                                'mark_admin_notification_read',
+                                                notification_id=notification[0]
+                                            )
+                                        }}"
+                                    >
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn-primary"
+                                            style="
+                                                width: auto;
+                                                padding: 7px 12px;
+                                            "
+                                        >
+
+                                            Mark as Read
+
+                                        </button>
+
+
+                                    </form>
+
+
+                                {% else %}
+
+
+                                    <span style="
+                                        color: var(--success);
+                                        font-weight: 600;
+                                    ">
+
+                                        ✓ Read
+
+                                    </span>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <div class="card"
+                     style="
+                         text-align: center;
+                         padding: 40px;
+                     ">
+
+
+                    <div style="
+                        font-size: 2rem;
+                        margin-bottom: 10px;
+                    ">
+
+                        🔔
+
+                    </div>
+
+
+                    <h3>
+
+                        No Notifications
+
+                    </h3>
+
+
+                    <p style="color: var(--text-muted);">
+
+                        You don't have any notifications yet.
+
+                    </p>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>
