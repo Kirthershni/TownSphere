@@ -46,21 +46,19 @@ Version Control : Git and GitHub
 ## Repository Structure
 
 TownSphere/
-│
-├── database/
-│   ├── schema.sql
-│   └── sample_data.sql
-│
-├── outputs/
-├── static/
-├── templates/
-│
-├── app.py
-├── db.py
-├── dispatcher.py
-├── requirements.txt
-├── .gitignore
-└── README.md
+  database/
+    schema.sql
+    sample_data.sql
+    README.md
+  outputs/
+  static/
+  templates/
+  app.py
+  db.py
+  dispatcher.py
+  requirements.txt
+  .gitignore
+  README.md
 
 ## Database Setup
 
