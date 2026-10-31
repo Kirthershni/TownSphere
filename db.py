@@ -2,9 +2,10 @@ import os
 import oracledb
 
 # Database connection details with fallback environment variables
-DB_USER = os.environ.get("DB_USER", "system")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "kirthu")
-DB_DSN = os.environ.get("DB_DSN", "localhost:1521/XE")
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_DSN = os.getenv("DB_DSN")
 
 def get_db_connection():
     """Establishes and returns a connection to the Oracle Database."""
