@@ -47,9 +47,6 @@ Version Control : Git and GitHub
 
 TownSphere/
   - database/
-    schema.sql
-    sample_data.sql
-    README.md
   - outputs/
   - static/
   - templates/
