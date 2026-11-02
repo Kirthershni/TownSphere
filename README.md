@@ -67,8 +67,8 @@ TownSphere/
 The `database` folder contains the SQL files required to prepare the database.
 
 1. Open Oracle Database and connect using your database credentials.
-2. Execute `database/schema.sql` to create the required tables.
-3. Execute `database/sample_data.sql` to insert fictional sample records.
+2. Execute database/schema.sql to create the required tables.
+3. Execute database/sample_data.sql to insert fictional sample records.
 
 Note: The sample data is intended for demonstration purposes. Replace placeholder password hashes before using any sample accounts for authentication.
 
