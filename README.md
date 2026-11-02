@@ -36,10 +36,15 @@ The platform connects residents, maintenance staff, and administrators through a
 ## Technology Stack
 
 Frontend : HTML, CSS, JavaScript 
+
 Backend : Python Flask 
+
 Database : Oracle Database 
+
 Database Connectivity : python-oracledb 
+
 Development Environment : Visual Studio Code 
+
 Version Control : Git and GitHub 
 
 
